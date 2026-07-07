@@ -1,34 +1,47 @@
-# Project Roadmap
+# 13 - Project Roadmap
 
-Status:
-Draft
+## Phase 1
 
-Version:
-0.1.0
+Project Setup
 
-Owner:
-Project Team
+## Phase 2
 
-Last Updated:
-2026-07-07
+Authentication
 
-## Purpose
-[Placeholder]
+## Phase 3
 
-## Scope
-[Placeholder]
+Database
 
-## Sections
-[Placeholder]
+## Phase 4
 
-## TODO checklist
-- [ ] [Placeholder]
+Resume Upload
 
-## Notes
-[Placeholder]
+## Phase 5
 
-## References
-[Placeholder]
+Resume Parsing
 
-## Future Work
-[Placeholder]
+## Phase 6
+
+ATS Engine
+
+## Phase 7
+
+AI Integration
+
+## Phase 8
+
+Job Matching
+
+## Phase 9
+
+Dashboard
+
+## Phase 10
+
+Deployment
+
+---
+
+## Agent Instructions
+
+Complete one phase before starting the next.

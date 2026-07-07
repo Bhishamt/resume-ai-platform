@@ -1,34 +1,24 @@
-# Monitoring
+# 18 - Monitoring
 
-Status:
-Draft
+## Monitor
 
-Version:
-0.1.0
+- API Health
+- Database
+- AI Usage
+- Response Time
+- Error Rate
 
-Owner:
-Project Team
+---
 
-Last Updated:
-2026-07-07
+## Metrics
 
-## Purpose
-[Placeholder]
+- CPU
+- Memory
+- Storage
+- Active Users
 
-## Scope
-[Placeholder]
+---
 
-## Sections
-[Placeholder]
+## Agent Instructions
 
-## TODO checklist
-- [ ] [Placeholder]
-
-## Notes
-[Placeholder]
-
-## References
-[Placeholder]
-
-## Future Work
-[Placeholder]
+Expose a health endpoint and monitor critical services.

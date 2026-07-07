@@ -1,34 +1,54 @@
-# Deployment
+# 10 - Deployment
 
-Status:
-Draft
+## Stack
 
-Version:
-0.1.0
+- Docker
+- Docker Compose
+- Nginx
+- PostgreSQL
 
-Owner:
-Project Team
+---
 
-Last Updated:
-2026-07-07
+## Environment
 
-## Purpose
-[Placeholder]
+- Development
+- Staging
+- Production
 
-## Scope
-[Placeholder]
+---
 
-## Sections
-[Placeholder]
+## Requirements
 
-## TODO checklist
-- [ ] [Placeholder]
+- Environment Variables
+- HTTPS
+- Dockerized Services
+- Health Checks
 
-## Notes
-[Placeholder]
+---
 
-## References
-[Placeholder]
+## CI/CD
 
-## Future Work
-[Placeholder]
+GitHub Actions
+
+Pipeline:
+
+- Install
+- Lint
+- Test
+- Build
+- Deploy
+
+---
+
+## Deliverables
+
+- Dockerfile
+- docker-compose.yml
+- .env.example
+- Deployment Guide
+
+---
+
+## Agent Instructions
+
+Deployment must be reproducible using Docker.

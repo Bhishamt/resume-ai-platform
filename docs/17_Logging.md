@@ -17,7 +17,29 @@ Last Updated:
 
 ## Scope
 [Placeholder]
+# 17 - Logging
 
+## Log
+
+- Login
+- Uploads
+- AI Requests
+- Errors
+- Admin Actions
+
+---
+
+## Don't Log
+
+- Passwords
+- Tokens
+- API Keys
+
+---
+
+## Agent Instructions
+
+Use structured logging throughout the application.
 ## Sections
 [Placeholder]
 

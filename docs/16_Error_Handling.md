@@ -1,34 +1,22 @@
-# Error Handling
+# 16 - Error Handling
 
-Status:
-Draft
+## Rules
 
-Version:
-0.1.0
+- Validate Input
+- Catch Exceptions
+- Log Errors
+- Friendly Messages
 
-Owner:
-Project Team
+---
 
-Last Updated:
-2026-07-07
+## Never Show
 
-## Purpose
-[Placeholder]
+- Stack Trace
+- SQL Errors
+- Secrets
 
-## Scope
-[Placeholder]
+---
 
-## Sections
-[Placeholder]
+## Agent Instructions
 
-## TODO checklist
-- [ ] [Placeholder]
-
-## Notes
-[Placeholder]
-
-## References
-[Placeholder]
-
-## Future Work
-[Placeholder]
+Every error must be handled gracefully.

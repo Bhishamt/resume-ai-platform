@@ -1,34 +1,33 @@
-# Environment
+# 19 - Environment
 
-Status:
-Draft
+## Required Variables
 
-Version:
-0.1.0
+DATABASE_URL
 
-Owner:
-Project Team
+SECRET_KEY
 
-Last Updated:
-2026-07-07
+JWT_SECRET
 
-## Purpose
-[Placeholder]
+GROQ_API_KEY
 
-## Scope
-[Placeholder]
+UPLOAD_DIR
 
-## Sections
-[Placeholder]
+MAX_UPLOAD_SIZE
 
-## TODO checklist
-- [ ] [Placeholder]
+APP_ENV
 
-## Notes
-[Placeholder]
+CORS_ORIGINS
 
-## References
-[Placeholder]
+---
 
-## Future Work
-[Placeholder]
+## Rules
+
+- Never commit .env
+- Provide .env.example
+- Validate environment variables on startup
+
+---
+
+## Agent Instructions
+
+Application must fail fast if required environment variables are missing.

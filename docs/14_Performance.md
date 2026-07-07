@@ -1,34 +1,36 @@
-# Performance
+# 14 - Performance
 
-Status:
-Draft
+## Goals
 
-Version:
-0.1.0
+- Fast Loading
+- Optimized Queries
+- Lazy Loading
+- Code Splitting
 
-Owner:
-Project Team
+---
 
-Last Updated:
-2026-07-07
+## Backend
 
-## Purpose
-[Placeholder]
+- Async APIs
+- Indexed Database
+- Efficient Queries
 
-## Scope
-[Placeholder]
+---
 
-## Sections
-[Placeholder]
+## Frontend
 
-## TODO checklist
-- [ ] [Placeholder]
+- Lazy Routes
+- Image Optimization
+- Skeleton Loaders
 
-## Notes
-[Placeholder]
+---
 
-## References
-[Placeholder]
+## Target
 
-## Future Work
-[Placeholder]
+Lighthouse Score > 90
+
+---
+
+## Agent Instructions
+
+Optimize before adding new features.

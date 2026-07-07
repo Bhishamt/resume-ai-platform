@@ -1,34 +1,39 @@
-# Git Workflow
+# 12 - Git Workflow
 
-Status:
-Draft
+## Branches
 
-Version:
-0.1.0
+- main
+- develop
+- feature/*
+- bugfix/*
+- hotfix/*
 
-Owner:
-Project Team
+---
 
-Last Updated:
-2026-07-07
+## Commit Format
 
-## Purpose
-[Placeholder]
+feat:
 
-## Scope
-[Placeholder]
+fix:
 
-## Sections
-[Placeholder]
+docs:
 
-## TODO checklist
-- [ ] [Placeholder]
+refactor:
 
-## Notes
-[Placeholder]
+test:
 
-## References
-[Placeholder]
+style:
 
-## Future Work
-[Placeholder]
+---
+
+## Pull Requests
+
+- Description
+- Screenshots
+- Tests Passed
+
+---
+
+## Agent Instructions
+
+Make small, meaningful commits.

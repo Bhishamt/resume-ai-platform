@@ -1,34 +1,21 @@
-# Accessibility
+# 15 - Accessibility
 
-Status:
-Draft
+## Standards
 
-Version:
-0.1.0
+WCAG 2.1 AA
 
-Owner:
-Project Team
+---
 
-Last Updated:
-2026-07-07
+## Requirements
 
-## Purpose
-[Placeholder]
+- Keyboard Navigation
+- Screen Readers
+- Focus States
+- ARIA Labels
+- Semantic HTML
 
-## Scope
-[Placeholder]
+---
 
-## Sections
-[Placeholder]
+## Agent Instructions
 
-## TODO checklist
-- [ ] [Placeholder]
-
-## Notes
-[Placeholder]
-
-## References
-[Placeholder]
-
-## Future Work
-[Placeholder]
+Accessibility is mandatory, not optional.
