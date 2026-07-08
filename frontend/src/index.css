@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colors */
+  --color-background: #050505;
+  --color-surface: #111111;
+  --color-glass: rgba(255, 255, 255, 0.05);
+  
+  --color-primary: #FFFFFF;
+  --color-primary-foreground: #000000;
+  
+  --color-secondary: #222222;
+  --color-secondary-foreground: #FFFFFF;
+  
+  --color-muted: #1a1a1a;
+  --color-muted-foreground: rgba(255, 255, 255, 0.55);
+  
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-ring: rgba(255, 255, 255, 0.3);
+  
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+
+  /* Typography */
+  --font-sans: 'Poppins', sans-serif;
+  --font-serif: 'Source Serif 4', serif;
+
+  /* Border Radius */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 999px;
+  
+  /* Animations */
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  
+  @keyframes accordion-down {
+    from { height: 0; }
+    to { height: var(--radix-accordion-content-height); }
+  }
+  @keyframes accordion-up {
+    from { height: var(--radix-accordion-content-height); }
+    to { height: 0; }
+  }
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 2%; /* #050505 */
+    --foreground: 0 0% 100%;
+    
+    --border: 0 0% 15%;
+    --ring: 0 0% 100%;
+  }
+
+  /* Define base styles */
+  html {
+    font-family: var(--font-sans);
+    background-color: var(--color-background);
+    color: var(--color-primary);
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    border-color: var(--color-border);
+  }
+}
+
+@layer components {
+  /* Glassmorphism Utilities */
+  .glass {
+    @apply bg-glass backdrop-blur-xl border border-white/10;
+  }
+  
+  .glass-card {
+    @apply bg-surface/50 backdrop-blur-2xl border border-white/5 rounded-2xl shadow-xl;
+  }
+  
+  .glass-panel {
+    @apply bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[var(--radius-lg)] shadow-2xl;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-white via-white/80 to-white/40;
+  }
+}

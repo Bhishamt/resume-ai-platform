@@ -1,38 +1,47 @@
-# Project Name
-[resume-ai-platform]
+# AI Resume Analyzer & Job Match Platform
 
-## Description
-[Placeholder]
-
-## Architecture Overview
-[Placeholder]
-
-## Tech Stack
-[Placeholder]
+## Overview
+A production-ready SaaS application designed to help job seekers optimize their resumes, improve ATS compatibility, receive AI-powered feedback, and evaluate resume compatibility against job descriptions.
 
 ## Folder Structure
-[Placeholder]
+```
+resume-ai-platform/
+├── backend/          # FastAPI backend application
+├── frontend/         # React + Vite frontend application
+├── docker/           # Dockerfiles and configuration
+├── docs/             # Project documentation and guidelines
+├── scripts/          # Utility scripts
+├── uploads/          # Temporary file storage
+├── screenshots/      # UI screenshots for README
+├── .github/          # GitHub Actions workflows
+├── docker-compose.yml
+├── .env.example
+└── README.md
+```
 
-## Features
-[Placeholder]
+## Tech Stack
+- **Frontend**: React, Vite, Tailwind CSS, React Router, React Hook Form
+- **Backend**: FastAPI, SQLAlchemy, Alembic, Pydantic, JWT, bcrypt
+- **Database**: PostgreSQL
+- **AI Integration**: Groq API
+- **Deployment**: Docker, Docker Compose, Nginx
 
 ## Installation
-[Placeholder]
 
-## Development Workflow
-[Placeholder]
+### Using Docker (Recommended)
+1. Copy `.env.example` to `.env` and fill in the values.
+2. Run `docker-compose up --build`
 
-## Deployment
-[Placeholder]
+### Local Development
 
-## License
-[Placeholder]
+#### Backend
+1. `cd backend`
+2. `python -m venv venv`
+3. `venv\Scripts\activate` (Windows) or `source venv/bin/activate` (Mac/Linux)
+4. `pip install -r requirements.txt`
+5. `uvicorn app.main:app --reload`
 
-## Contribution Guide
-[Placeholder]
-
-## Roadmap
-[Placeholder]
-
-## Screenshots Placeholder
-[Placeholder]
+#### Frontend
+1. `cd frontend`
+2. `npm install`
+3. `npm run dev`
