@@ -10,6 +10,7 @@ import ResumeUpload from "@/pages/ResumeUpload";
 import ResumeList from "@/pages/ResumeList";
 import ResumeDetails from "@/pages/ResumeDetails";
 import UploadHistoryPage from "@/pages/UploadHistoryPage";
+import AtsDashboard from "@/pages/AtsDashboard";
 import { ProtectedRoute } from "@/components/common/ProtectedRoute";
 
 export default function AppRoutes() {
@@ -60,6 +61,15 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/resumes/:id/analysis"
+        element={
+          <ProtectedRoute>
+            <AtsDashboard />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }
+

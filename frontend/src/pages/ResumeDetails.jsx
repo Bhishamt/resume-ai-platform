@@ -209,6 +209,15 @@ export default function ResumeDetails() {
             </div>
 
             <div className="flex items-center gap-3">
+              <Link to={`/resumes/${resume.id}/analysis`}>
+                <Button
+                  variant="outline"
+                  className="rounded-full gap-1.5 text-xs font-semibold bg-white/5 hover:bg-white/10"
+                >
+                  <Sparkles className="h-3.5 w-3.5 text-white/70" />
+                  View ATS Score
+                </Button>
+              </Link>
               <Button
                 variant="outline"
                 onClick={handleReplaceClick}
@@ -231,6 +240,7 @@ export default function ResumeDetails() {
                 Delete
               </Button>
             </div>
+
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

@@ -29,6 +29,8 @@ class Resume(Base):
     # Relationships
     user = relationship("User", back_populates="resumes")
     upload_histories = relationship("UploadHistory", back_populates="resume", cascade="all, delete-orphan")
+    analysis_reports = relationship("AnalysisReport", back_populates="resume", cascade="all, delete-orphan")
+
 
     def __repr__(self) -> str:
         return f"<Resume id={self.id} title={self.title} user_id={self.user_id}>"
