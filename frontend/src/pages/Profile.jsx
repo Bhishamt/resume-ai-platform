@@ -3,8 +3,8 @@ import { useAuth } from "@/context/AuthContext";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { AlertCircle, User as UserIcon, Mail, Calendar, Camera, Shield, LogOut, Check } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { User as UserIcon, Mail, Calendar, Camera, Shield, LogOut, Check } from "lucide-react";
 import { useToast } from "@/hooks/useToast";
 import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast";
 

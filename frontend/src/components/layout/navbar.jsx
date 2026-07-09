@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import { User, LogOut, LayoutDashboard, Menu, X } from "lucide-react";
+import { User, LogOut, Menu, X, FileText } from "lucide-react";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -66,7 +66,14 @@ export function Navbar() {
         {/* Auth status desktop */}
         <div className="hidden md:flex items-center space-x-4">
           {isAuthenticated ? (
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
+              <Link
+                to="/resumes"
+                className="flex items-center space-x-2 text-sm font-medium text-white/70 transition-colors hover:text-white"
+              >
+                <FileText className="h-4 w-4 text-white/60" />
+                <span>My Resumes</span>
+              </Link>
               <Link
                 to="/profile"
                 className="flex items-center space-x-2 text-sm font-medium text-white/70 transition-colors hover:text-white"
@@ -157,6 +164,14 @@ export function Navbar() {
           <div className="border-t border-white/5 pt-4 flex flex-col space-y-3">
             {isAuthenticated ? (
               <>
+                <Link
+                  to="/resumes"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-2 text-sm font-medium text-white/75"
+                >
+                  <FileText className="h-4 w-4" />
+                  <span>My Resumes</span>
+                </Link>
                 <Link
                   to="/profile"
                   onClick={() => setMobileMenuOpen(false)}
