@@ -140,11 +140,11 @@ class AdminLogResponse(BaseModel):
     action: str
     entity: str
     entity_id: Optional[str] = None
-    metadata: Dict[str, Any]
+    log_metadata: Dict[str, Any] = Field(default_factory=dict, alias="log_metadata")
     ip_address: Optional[str] = None
     created_at: datetime
 
-    model_config = {"from_attributes": True}
+    model_config = {"from_attributes": True, "populate_by_name": True}
 
 
 class AdminLogListResponse(BaseModel):

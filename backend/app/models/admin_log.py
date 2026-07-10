@@ -34,7 +34,7 @@ class AdminLog(Base):
     # UUID string of the affected resource (may be None for system-level actions)
     entity_id = Column(String(255), nullable=True)
     # Arbitrary JSON payload — before/after values, extra context
-    metadata = Column(JSON, nullable=False, default=dict)
+    log_metadata = Column(JSON, nullable=False, default=dict)
     ip_address = Column(String(45), nullable=True)
     created_at = Column(
         DateTime(timezone=True),

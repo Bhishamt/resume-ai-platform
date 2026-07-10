@@ -47,7 +47,7 @@ def upgrade() -> None:
         sa.Column("entity", sa.String(100), nullable=False),
         sa.Column("entity_id", sa.String(255), nullable=True),
         sa.Column(
-            "metadata",
+            "log_metadata",
             postgresql.JSON(astext_type=sa.Text()),
             nullable=False,
             server_default="{}",

@@ -245,7 +245,7 @@ def create_admin_log(
         action=action,
         entity=entity,
         entity_id=entity_id,
-        metadata=metadata or {},
+        log_metadata=metadata or {},
         ip_address=ip_address,
     )
     db.add(log)
