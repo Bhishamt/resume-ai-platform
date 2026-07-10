@@ -106,16 +106,7 @@ class KeywordAnalyzer:
         ind_count = len(found_by_category["Industry Keywords"])
         category_scores["Industry Keywords"] = min(100, int((ind_count / 5) * 100))
 
-        # 3. Calculate Overall Keyword Score using category weights
-        # Tech: 40%, Soft: 20%, Verbs: 20%, Industry: 20%
-        overall_score = int(
-            (category_scores["Technical Skills"] * 0.40) +
-            (category_scores["Soft Skills"] * 0.20) +
-            (category_scores["Action Verbs"] * 0.20) +
-            (category_scores["Industry Keywords"] * 0.20)
-        )
-
-        # 4. Identify missing critical keywords
+        # 3. Identify missing critical keywords
         missing_critical = []
         for kw in cls.CRITICAL_KEYWORDS:
             # Check if critical keyword was found in any category (case-insensitive check)
@@ -124,15 +115,98 @@ class KeywordAnalyzer:
                 if any(x.lower() == kw.lower() for x in cat_list):
                     kw_found = True
                     break
+            
+            # Special check for "api" - also match "rest api"
+            if kw == "api" and not kw_found:
+                for cat_list in found_by_category.values():
+                    if any("rest api" in x.lower() or "api" in x.lower() for x in cat_list):
+                        kw_found = True
+                        break
+
             if not kw_found:
                 display_kw = kw.title() if len(kw) > 3 else kw.upper()
                 if kw == "ci/cd":
                     display_kw = "CI/CD"
+                elif kw == "api":
+                    display_kw = "REST API"
                 missing_critical.append(display_kw)
+
+        # 4. Calculate rule-based explainable score (out of 30 max points)
+        reasons = []
+        weighted_score = 30
+        
+        # Critical keyword deductions
+        critical_deductions = {
+            "python": ("Python", -3),
+            "javascript": ("Javascript", -3),
+            "react": ("React", -3),
+            "sql": ("SQL", -3),
+            "git": ("Git", -2),
+            "docker": ("Docker", -2),
+            "aws": ("AWS", -2),
+            "agile": ("Agile", -2),
+            "api": ("REST API", -2),
+            "ci/cd": ("CI/CD", -2)
+        }
+        
+        for kw in cls.CRITICAL_KEYWORDS:
+            # Recheck if missing
+            kw_found = False
+            for cat_list in found_by_category.values():
+                if any(x.lower() == kw.lower() for x in cat_list):
+                    kw_found = True
+                    break
+            if kw == "api" and not kw_found:
+                for cat_list in found_by_category.values():
+                    if any("rest api" in x.lower() or "api" in x.lower() for x in cat_list):
+                        kw_found = True
+                        break
+
+            if not kw_found:
+                display_name, deduction = critical_deductions[kw]
+                reasons.append({"rule": f"Missing {display_name} keyword", "points": deduction})
+                weighted_score += deduction
+
+        # Category Density rules
+        if tech_count < 5:
+            reasons.append({"rule": "Low density of technical skills (<5 skills)", "points": -4})
+            weighted_score -= 4
+        elif tech_count < 10:
+            reasons.append({"rule": "Moderate density of technical skills (5-9 skills)", "points": -2})
+            weighted_score -= 2
+
+        if soft_count < 3:
+            reasons.append({"rule": "Low density of soft skills (<3 skills)", "points": -3})
+            weighted_score -= 3
+        elif soft_count < 5:
+            reasons.append({"rule": "Moderate density of soft skills (3-4 skills)", "points": -1})
+            weighted_score -= 1
+
+        if verbs_count < 4:
+            reasons.append({"rule": "Low count of action verbs (<4 verbs)", "points": -3})
+            weighted_score -= 3
+        elif verbs_count < 8:
+            reasons.append({"rule": "Moderate count of action verbs (4-7 verbs)", "points": -1})
+            weighted_score -= 1
+        else:
+            reasons.append({"rule": "Good action verbs", "points": 2})
+            weighted_score += 2
+
+        if ind_count < 3:
+            reasons.append({"rule": "Low density of industry keywords (<3 keywords)", "points": -3})
+            weighted_score -= 3
+        elif ind_count < 5:
+            reasons.append({"rule": "Moderate density of industry keywords (3-4 keywords)", "points": -1})
+            weighted_score -= 1
+
+        weighted_score = max(0, min(30, weighted_score))
+        overall_score = int(round(weighted_score / 0.3))
 
         return {
             "found_by_category": found_by_category,
             "missing_keywords": missing_critical,
             "category_scores": category_scores,
-            "score": overall_score
+            "score": overall_score,
+            "weighted_score": weighted_score,
+            "reasons": reasons
         }

@@ -17,6 +17,7 @@ class AnalysisReportResponse(BaseModel):
     weaknesses: list[str]
     missing_keywords: list[str]
     suggestions: list[str]
+    scoring_explanations: dict
     created_at: datetime
 
     model_config = {"from_attributes": True}

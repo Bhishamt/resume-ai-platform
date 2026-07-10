@@ -108,12 +108,29 @@ class SectionDetector:
             else:
                 missing.append(section)
 
-        # Calculate section score: percentage of detected sections
-        total_sections = len(cls.SECTION_PATTERNS)
-        score = int((len(detected) / total_sections) * 100) if total_sections > 0 else 0
+        # Calculate rule-based explainable score
+        reasons = []
+        weighted_score = 10
+        
+        # Core sections (2 points each deduction if missing)
+        core_sections = ["Summary", "Skills", "Experience", "Education", "Projects"]
+        for sec in core_sections:
+            if sec in missing:
+                reasons.append({"rule": f"Missing {sec} section", "points": -2})
+                weighted_score -= 2
+                
+        if "Certifications" in missing:
+            reasons.append({"rule": "Missing Certifications section", "points": -1})
+            weighted_score -= 1
+            
+        weighted_score = max(0, weighted_score)
+        # Keep score out of 100 for backward compatibility
+        score = int(round(weighted_score / 0.1))
 
         return {
             "detected_sections": detected,
             "missing_sections": missing,
-            "score": score
+            "score": score,
+            "weighted_score": weighted_score,
+            "reasons": reasons
         }

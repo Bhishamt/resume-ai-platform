@@ -43,6 +43,7 @@ export default function AtsDashboard() {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
+  const [expandedCategory, setExpandedCategory] = useState(null);
 
   const handleTriggerAnalysis = useCallback(async (isAuto = false) => {
     setAnalyzing(true);
@@ -107,6 +108,7 @@ export default function AtsDashboard() {
         { subject: "Keywords", score: report.keyword_score, fullMark: 100 },
         { subject: "Experience", score: report.experience_score, fullMark: 100 },
         { subject: "Formatting", score: report.formatting_score, fullMark: 100 },
+        { subject: "Sections", score: report.section_score || 0, fullMark: 100 },
         { subject: "Projects", score: report.projects_score, fullMark: 100 },
         { subject: "Education", score: report.education_score, fullMark: 100 },
         { subject: "Grammar", score: report.grammar_score, fullMark: 100 }
@@ -118,6 +120,7 @@ export default function AtsDashboard() {
         { name: "Keywords", Candidate: report.keyword_score, Benchmark: 75 },
         { name: "Experience", Candidate: report.experience_score, Benchmark: 70 },
         { name: "Formatting", Candidate: report.formatting_score, Benchmark: 80 },
+        { name: "Sections", Candidate: report.section_score || 0, Benchmark: 75 },
         { name: "Projects", Candidate: report.projects_score, Benchmark: 65 },
         { name: "Education", Candidate: report.education_score, Benchmark: 70 },
         { name: "Grammar", Candidate: report.grammar_score, Benchmark: 85 }
@@ -272,10 +275,11 @@ export default function AtsDashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Progress bars list */}
                 <Card className="lg:col-span-1 p-8 border-white/5 bg-white/[0.02]">
-                  <h3 className="text-sm font-semibold text-white mb-6 flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-white flex items-center gap-2">
                     <Hash className="h-4 w-4 text-white/50" />
                     Category Ratings
                   </h3>
+                  <p className="text-[10px] text-white/30 mt-1 mb-6 font-normal">Click a category below to view explainable scoring reasons</p>
                   <div className="space-y-5">
                     {categoryData.map((cat) => {
                       let color = "bg-red-500";
@@ -283,10 +287,19 @@ export default function AtsDashboard() {
                       else if (cat.score >= 60) color = "bg-yellow-500";
 
                       return (
-                        <div key={cat.subject} className="space-y-1.5">
+                        <div
+                          key={cat.subject}
+                          className="space-y-1.5 cursor-pointer hover:bg-white/[0.02] p-2 -mx-2 rounded transition-all duration-200"
+                          onClick={() => setExpandedCategory(expandedCategory === cat.subject ? null : cat.subject)}
+                        >
                           <div className="flex items-center justify-between text-xs">
                             <span className="text-white/60 font-medium">{cat.subject}</span>
-                            <span className="text-white font-semibold">{cat.score}%</span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-white font-semibold">{cat.score}%</span>
+                              <span className="text-[9px] text-white/30">
+                                {expandedCategory === cat.subject ? "▼" : "▶"}
+                              </span>
+                            </div>
                           </div>
                           <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                             <div
@@ -294,6 +307,31 @@ export default function AtsDashboard() {
                               style={{ width: `${cat.score}%` }}
                             />
                           </div>
+
+                          {expandedCategory === cat.subject && report.scoring_explanations?.[cat.subject] && (
+                            <div className="mt-2.5 pl-3 border-l-2 border-white/10 space-y-1.5 text-[11px] text-white/70">
+                              <div className="text-white/40 mb-1 flex justify-between text-[10px] tracking-wide uppercase font-semibold">
+                                <span>Weighted Score:</span>
+                                <span>
+                                  {report.scoring_explanations[cat.subject].score} / {report.scoring_explanations[cat.subject].max_score} pts
+                                </span>
+                              </div>
+                              {report.scoring_explanations[cat.subject].reasons.length === 0 ? (
+                                <p className="text-green-400 italic">All checks passed, no deductions applied.</p>
+                              ) : (
+                                <div className="space-y-1.5">
+                                  {report.scoring_explanations[cat.subject].reasons.map((reason, idx) => (
+                                    <div key={idx} className="flex justify-between items-start gap-2">
+                                      <span>• {reason.rule}</span>
+                                      <span className={reason.points > 0 ? "text-green-400 font-semibold shrink-0" : "text-red-400 font-semibold shrink-0"}>
+                                        {reason.points > 0 ? `+${reason.points}` : reason.points}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       );
                     })}

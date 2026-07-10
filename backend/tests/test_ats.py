@@ -142,6 +142,17 @@ class TestAnalysisEndpoints:
         assert "ats_score" in data["data"]
         assert len(data["data"]["strengths"]) > 0
         assert len(data["data"]["suggestions"]) > 0
+        
+        # Verify scoring explanations exist and are structured correctly
+        assert "scoring_explanations" in data["data"]
+        exps = data["data"]["scoring_explanations"]
+        assert "Keywords" in exps
+        assert "Experience" in exps
+        assert "Formatting" in exps
+        assert "Sections" in exps
+        assert "reasons" in exps["Keywords"]
+        assert "reasons" in exps["Experience"]
+        assert isinstance(exps["Keywords"]["reasons"], list)
 
     def test_create_analysis_report_not_found(self, client, auth_headers):
         random_uuid = uuid4()

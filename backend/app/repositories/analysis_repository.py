@@ -34,6 +34,7 @@ def create(db: Session, resume_id: UUID, report_data: dict) -> AnalysisReport:
         weaknesses=report_data["weaknesses"],
         missing_keywords=report_data["missing_keywords"],
         suggestions=report_data["suggestions"],
+        scoring_explanations=report_data["scoring_explanations"],
     )
     db.add(report)
     db.commit()

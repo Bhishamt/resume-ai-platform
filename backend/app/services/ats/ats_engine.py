@@ -59,36 +59,104 @@ class AtsEngine:
         detected_sections = sections_res["detected_sections"]
         missing_sections = sections_res["missing_sections"]
         section_score = sections_res["score"]
+        section_weighted = sections_res.get("weighted_score", 10)
+        section_reasons = sections_res.get("reasons", [])
 
         # 3. Run Keyword Analyzer
         keyword_res = KeywordAnalyzer.analyze_keywords(parsed_text)
         found_keywords = keyword_res["found_by_category"]
         missing_keywords = keyword_res["missing_keywords"]
         keyword_score = keyword_res["score"]
+        keyword_weighted = keyword_res.get("weighted_score", 30)
+        keyword_reasons = keyword_res.get("reasons", [])
 
         # 4. Run Formatting Checker
         formatting_res = FormattingChecker.check_formatting(parsed_text, detected_sections)
         formatting_score = formatting_res["score"]
         formatting_details = formatting_res["details"]
         formatting_feedback = formatting_res["feedback"]
+        formatting_weighted = formatting_res.get("weighted_score", 15)
+        formatting_reasons = formatting_res.get("reasons", [])
 
         # 5. Run Experience Evaluator
         action_verbs_found = found_keywords.get("Action Verbs", [])
-        experience_score, years_of_exp = ScoreCalculator.calculate_experience_score(parsed_text, action_verbs_found)
+        experience_score, years_of_exp, experience_weighted, experience_reasons = \
+            ScoreCalculator.calculate_experience_score_explainable(parsed_text, action_verbs_found)
 
         # 6. Run Projects Evaluator
         tech_skills_found = found_keywords.get("Technical Skills", [])
-        projects_score = ScoreCalculator.calculate_projects_score(parsed_text, tech_skills_found)
+        projects_score, projects_weighted, projects_reasons = \
+            ScoreCalculator.calculate_projects_score_explainable(parsed_text, tech_skills_found)
 
         # 7. Run Education Evaluator
-        education_score = ScoreCalculator.calculate_education_score(parsed_text)
+        education_score, education_weighted, education_reasons = \
+            ScoreCalculator.calculate_education_score_explainable(parsed_text)
 
         # 8. Run Grammar Evaluator
-        grammar_res = ScoreCalculator.calculate_grammar_score(parsed_text)
-        grammar_score = grammar_res["score"]
-        grammar_feedback = grammar_res["feedback"]
+        grammar_score, grammar_weighted, grammar_reasons = \
+            ScoreCalculator.calculate_grammar_score_explainable(parsed_text)
+        grammar_feedback = [r["rule"] for r in grammar_reasons]
 
         # 9. Calculate final weighted score
+        ats_score = (
+            keyword_weighted +
+            experience_weighted +
+            formatting_weighted +
+            section_weighted +
+            projects_weighted +
+            education_weighted +
+            grammar_weighted
+        )
+        # In this phase, we map resume_score directly to the calculated ATS score
+        resume_score = ats_score
+
+        # 10. Generate scoring explanations JSON structure
+        scoring_explanations = {
+            "Keywords": {
+                "score": keyword_weighted,
+                "max_score": 30,
+                "percentage": keyword_score,
+                "reasons": keyword_reasons
+            },
+            "Experience": {
+                "score": experience_weighted,
+                "max_score": 20,
+                "percentage": experience_score,
+                "reasons": experience_reasons
+            },
+            "Formatting": {
+                "score": formatting_weighted,
+                "max_score": 15,
+                "percentage": formatting_score,
+                "reasons": formatting_reasons
+            },
+            "Sections": {
+                "score": section_weighted,
+                "max_score": 10,
+                "percentage": section_score,
+                "reasons": section_reasons
+            },
+            "Projects": {
+                "score": projects_weighted,
+                "max_score": 10,
+                "percentage": projects_score,
+                "reasons": projects_reasons
+            },
+            "Education": {
+                "score": education_weighted,
+                "max_score": 10,
+                "percentage": education_score,
+                "reasons": education_reasons
+            },
+            "Grammar": {
+                "score": grammar_weighted,
+                "max_score": 5,
+                "percentage": grammar_score,
+                "reasons": grammar_reasons
+            }
+        }
+
+        # 11. Generate strengths, weaknesses, and suggestions
         category_scores = {
             "keyword_score": keyword_score,
             "experience_score": experience_score,
@@ -99,11 +167,6 @@ class AtsEngine:
             "section_score": section_score
         }
         
-        ats_score = ScoreCalculator.calculate_final_score(category_scores)
-        # In this phase, we map resume_score directly to the calculated ATS score
-        resume_score = ats_score
-
-        # 10. Generate strengths, weaknesses, and suggestions
         recommendations = RecommendationEngine.generate_recommendations(
             category_scores=category_scores,
             detected_sections=detected_sections,
@@ -127,5 +190,6 @@ class AtsEngine:
             "strengths": recommendations["strengths"],
             "weaknesses": recommendations["weaknesses"],
             "missing_keywords": missing_keywords,
-            "suggestions": recommendations["suggestions"]
+            "suggestions": recommendations["suggestions"],
+            "scoring_explanations": scoring_explanations
         }

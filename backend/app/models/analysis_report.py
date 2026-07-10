@@ -26,6 +26,7 @@ class AnalysisReport(Base):
     weaknesses = Column(JSON, nullable=False, default=list)
     missing_keywords = Column(JSON, nullable=False, default=list)
     suggestions = Column(JSON, nullable=False, default=list)
+    scoring_explanations = Column(JSON, nullable=False, default=dict)
     
     created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc))
 
