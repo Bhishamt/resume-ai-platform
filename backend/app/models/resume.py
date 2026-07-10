@@ -30,6 +30,7 @@ class Resume(Base):
     user = relationship("User", back_populates="resumes")
     upload_histories = relationship("UploadHistory", back_populates="resume", cascade="all, delete-orphan")
     analysis_reports = relationship("AnalysisReport", back_populates="resume", cascade="all, delete-orphan")
+    job_matches = relationship("JobMatch", back_populates="resume", cascade="all, delete-orphan")
 
 
     def __repr__(self) -> str:

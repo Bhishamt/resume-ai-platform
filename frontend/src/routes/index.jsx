@@ -11,6 +11,7 @@ import ResumeList from "@/pages/ResumeList";
 import ResumeDetails from "@/pages/ResumeDetails";
 import UploadHistoryPage from "@/pages/UploadHistoryPage";
 import AtsDashboard from "@/pages/AtsDashboard";
+import JobMatching from "@/pages/JobMatching";
 import { ProtectedRoute } from "@/components/common/ProtectedRoute";
 
 export default function AppRoutes() {
@@ -66,6 +67,14 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <AtsDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/job-matching"
+        element={
+          <ProtectedRoute>
+            <JobMatching />
           </ProtectedRoute>
         }
       />

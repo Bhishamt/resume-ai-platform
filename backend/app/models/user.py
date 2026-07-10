@@ -40,6 +40,7 @@ class User(Base):
     # Relationships
     resumes = relationship("Resume", back_populates="user", cascade="all, delete-orphan")
     upload_histories = relationship("UploadHistory", back_populates="user", cascade="all, delete-orphan")
+    job_descriptions = relationship("JobDescription", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return f"<User id={self.id} email={self.email}>"
