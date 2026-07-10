@@ -7,5 +7,7 @@ from app.models.analysis_report import AnalysisReport  # noqa: F401
 from app.models.job_description import JobDescription  # noqa: F401
 from app.models.job_match import JobMatch  # noqa: F401
 from app.models.ai_feedback import AIFeedback  # noqa: F401
+from app.models.dashboard_preferences import DashboardPreferences  # noqa: F401
+
 
 

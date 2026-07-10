@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import { User, LogOut, Menu, X, FileText, Briefcase, Sparkles } from "lucide-react";
+import { User, LogOut, Menu, X, FileText, Briefcase, Sparkles, Grid } from "lucide-react";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -67,6 +67,13 @@ export function Navbar() {
         <div className="hidden md:flex items-center space-x-4">
           {isAuthenticated ? (
             <div className="flex items-center space-x-6">
+              <Link
+                to="/dashboard"
+                className="flex items-center space-x-2 text-sm font-medium text-white/70 transition-colors hover:text-white"
+              >
+                <Grid className="h-4 w-4 text-white/60" />
+                <span>Dashboard</span>
+              </Link>
               <Link
                 to="/resumes"
                 className="flex items-center space-x-2 text-sm font-medium text-white/70 transition-colors hover:text-white"
@@ -178,6 +185,14 @@ export function Navbar() {
           <div className="border-t border-white/5 pt-4 flex flex-col space-y-3">
             {isAuthenticated ? (
               <>
+                <Link
+                  to="/dashboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-2 text-sm font-medium text-white/75"
+                >
+                  <Grid className="h-4 w-4" />
+                  <span>Dashboard</span>
+                </Link>
                 <Link
                   to="/resumes"
                   onClick={() => setMobileMenuOpen(false)}

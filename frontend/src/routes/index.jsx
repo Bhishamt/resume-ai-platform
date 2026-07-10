@@ -13,7 +13,9 @@ import UploadHistoryPage from "@/pages/UploadHistoryPage";
 import AtsDashboard from "@/pages/AtsDashboard";
 import JobMatching from "@/pages/JobMatching";
 import AiAssistant from "@/pages/AiAssistant";
+import Dashboard from "@/pages/Dashboard";
 import { ProtectedRoute } from "@/components/common/ProtectedRoute";
+
 
 export default function AppRoutes() {
   return (
@@ -84,6 +86,14 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <AiAssistant />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
           </ProtectedRoute>
         }
       />
