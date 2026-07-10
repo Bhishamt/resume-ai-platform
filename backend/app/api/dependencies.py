@@ -67,3 +67,18 @@ def get_current_active_user(
     if not current_user.is_active:
         raise AuthenticationError("This account has been deactivated.")
     return current_user
+
+
+def get_admin_user(
+    current_user: User = Depends(get_current_active_user),
+) -> User:
+    """Ensure the requesting user is an active admin.
+
+    Raises:
+        AuthorizationError: If the user does not hold the 'admin' role.
+    """
+    from app.core.exceptions import AuthorizationError  # avoid circular import
+
+    if current_user.role != "admin":
+        raise AuthorizationError("Admin privileges required.")
+    return current_user
