@@ -12,6 +12,7 @@ import ResumeDetails from "@/pages/ResumeDetails";
 import UploadHistoryPage from "@/pages/UploadHistoryPage";
 import AtsDashboard from "@/pages/AtsDashboard";
 import JobMatching from "@/pages/JobMatching";
+import AiAssistant from "@/pages/AiAssistant";
 import { ProtectedRoute } from "@/components/common/ProtectedRoute";
 
 export default function AppRoutes() {
@@ -78,7 +79,16 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/ai-assistant"
+        element={
+          <ProtectedRoute>
+            <AiAssistant />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }
+
 

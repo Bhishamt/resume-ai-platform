@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import { User, LogOut, Menu, X, FileText, Briefcase } from "lucide-react";
+import { User, LogOut, Menu, X, FileText, Briefcase, Sparkles } from "lucide-react";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -80,6 +80,13 @@ export function Navbar() {
               >
                 <Briefcase className="h-4 w-4 text-white/60" />
                 <span>Job Match</span>
+              </Link>
+              <Link
+                to="/ai-assistant"
+                className="flex items-center space-x-2 text-sm font-medium text-white/70 transition-colors hover:text-white"
+              >
+                <Sparkles className="h-4 w-4 text-white/60" />
+                <span>AI Assistant</span>
               </Link>
               <Link
                 to="/profile"
@@ -186,6 +193,14 @@ export function Navbar() {
                 >
                   <Briefcase className="h-4 w-4" />
                   <span>Job Match</span>
+                </Link>
+                <Link
+                  to="/ai-assistant"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-2 text-sm font-medium text-white/75"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  <span>AI Assistant</span>
                 </Link>
                 <Link
                   to="/profile"
