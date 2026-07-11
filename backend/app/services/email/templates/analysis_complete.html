@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Your resume analysis is ready{% endblock %}
+{% block content %}
+<h1>Analysis Complete! 🚀</h1>
+<p>Hi {{ full_name }}, great news — your resume analysis for <strong style="color: #f1f5f9;">{{ resume_title }}</strong> is ready.</p>
+
+<div class="stat-box">
+  <div class="stat-value">{{ ats_score }}%</div>
+  <div class="stat-label">ATS Compatibility Score</div>
+</div>
+
+{% if ats_score >= 80 %}
+<p style="color: #4ade80;">🏆 Excellent! Your resume is highly ATS-compatible and ready for top-tier applications.</p>
+{% elif ats_score >= 60 %}
+<p style="color: #fbbf24;">⚡ Good start! There's room to improve. Check the full report for targeted suggestions.</p>
+{% else %}
+<p style="color: #f87171;">🔧 Your resume needs improvement. Don't worry — our AI has detailed suggestions to help you score higher.</p>
+{% endif %}
+
+<div style="text-align: center;">
+  <a href="{{ report_url }}" class="btn">View Full Report →</a>
+</div>
+
+<hr class="divider" />
+
+<p style="font-size: 13px; color: #64748b;">
+  The full report includes keyword analysis, missing skills, formatting suggestions, and AI-powered improvement recommendations.
+</p>
+{% endblock %}

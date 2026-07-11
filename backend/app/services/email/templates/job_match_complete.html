@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Your job match results are ready{% endblock %}
+{% block content %}
+<h1>Job Match Ready! 🎯</h1>
+<p>Hi {{ full_name }}, your job match analysis against <strong style="color: #f1f5f9;">{{ job_title }}</strong> is complete.</p>
+
+<div class="stat-box">
+  <div class="stat-value">{{ match_score }}%</div>
+  <div class="stat-label">Match Score</div>
+</div>
+
+{% if match_score >= 80 %}
+<p style="color: #4ade80;">🌟 Outstanding match! You're a strong candidate for this role. Apply with confidence.</p>
+{% elif match_score >= 60 %}
+<p style="color: #fbbf24;">💡 Solid match! A few targeted improvements to your resume could push you to the top of the applicant pool.</p>
+{% else %}
+<p style="color: #f87171;">📝 Room to grow. Check the missing skills report and consider addressing the identified gaps before applying.</p>
+{% endif %}
+
+<div style="text-align: center;">
+  <a href="{{ match_url }}" class="btn">View Match Report →</a>
+</div>
+
+<hr class="divider" />
+
+<p style="font-size: 13px; color: #64748b;">
+  The match report includes a skills gap analysis, missing keywords, tailored improvement suggestions, and a recommended cover letter prompt.
+</p>
+{% endblock %}

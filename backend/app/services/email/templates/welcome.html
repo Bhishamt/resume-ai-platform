@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Welcome to AI Resume Analyzer!{% endblock %}
+{% block content %}
+<h1>Welcome aboard, {{ full_name }}! 🎉</h1>
+<p>We're thrilled to have you join the AI Resume Analyzer & Job Match Platform.</p>
+<p>Your account is ready. Start by uploading your resume and let our AI-powered engine analyze it for ATS compatibility, identify missing keywords, and give you actionable improvement suggestions.</p>
+
+<div style="text-align: center;">
+  <a href="{{ dashboard_url }}" class="btn">Go to Dashboard →</a>
+</div>
+
+<hr class="divider" />
+
+<p style="font-size: 13px; color: #64748b;">
+  <strong style="color: #94a3b8;">What you can do:</strong>
+</p>
+<p style="font-size: 13px; color: #64748b;">✅ &nbsp;Upload PDF or DOCX resumes</p>
+<p style="font-size: 13px; color: #64748b;">✅ &nbsp;Get instant ATS compatibility scores</p>
+<p style="font-size: 13px; color: #64748b;">✅ &nbsp;Match your resume against job descriptions</p>
+<p style="font-size: 13px; color: #64748b;">✅ &nbsp;Get AI-powered improvement suggestions</p>
+<p style="font-size: 13px; color: #64748b;">✅ &nbsp;Generate cover letters & interview questions</p>
+
+<hr class="divider" />
+
+<p style="font-size: 13px; color: #64748b;">
+  If you have any questions, just reply to this email — we're always happy to help.
+</p>
+{% endblock %}

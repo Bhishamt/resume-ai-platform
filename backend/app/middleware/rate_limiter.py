@@ -1,8 +1,14 @@
-"""In-memory rate limiter middleware using a token bucket algorithm per IP.
+"""Rate limiter middleware — Redis-backed sliding window with in-memory fallback.
 
-Provides protection against brute-force attacks on auth endpoints.
+Uses Redis for distributed rate limiting across multiple workers.
+Falls back to in-memory counters if Redis is unavailable (resilient design).
+
+Limits:
+  - General API:  60 requests / 60 seconds per IP
+  - Auth routes:  10 requests / 60 seconds per IP
 """
 
+import asyncio
 import logging
 import time
 from collections import defaultdict
@@ -16,9 +22,20 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
+_AUTH_PATHS = frozenset(["/auth/login", "/auth/register", "/auth/forgot-password"])
+
+# In-memory fallback stores
+_fallback_general: dict[str, list[float]] = defaultdict(list)
+_fallback_auth: dict[str, list[float]] = defaultdict(list)
+
+
+def _clean(timestamps: list[float], window: int) -> list[float]:
+    now = time.time()
+    return [ts for ts in timestamps if now - ts < window]
+
 
 class RateLimiterMiddleware(BaseHTTPMiddleware):
-    """Rate limiter using a sliding window counter per client IP."""
+    """Distributed rate limiter using Redis; falls back to in-memory counters."""
 
     def __init__(
         self,
@@ -33,57 +50,73 @@ class RateLimiterMiddleware(BaseHTTPMiddleware):
         self.general_window = general_window
         self.auth_rate = auth_rate
         self.auth_window = auth_window
-        self._general_requests: dict[str, list[float]] = defaultdict(list)
-        self._auth_requests: dict[str, list[float]] = defaultdict(list)
 
     def _is_auth_endpoint(self, path: str) -> bool:
-        """Check if the request path is an authentication endpoint."""
-        auth_paths = ["/auth/login", "/auth/register", "/auth/forgot-password"]
-        return any(path.endswith(p) for p in auth_paths)
+        return any(path.endswith(p) for p in _AUTH_PATHS)
 
-    def _clean_old_requests(self, timestamps: list[float], window: int) -> list[float]:
-        """Remove timestamps outside the sliding window."""
-        now = time.time()
-        return [ts for ts in timestamps if now - ts < window]
+    async def _check_redis(self, key: str, limit: int, window: int) -> bool:
+        """Check rate limit via Redis. Returns True if request is allowed."""
+        from app.core.redis_client import rate_limit_check
+        allowed, _ = await rate_limit_check(f"rl:{key}", limit, window)
+        return allowed
+
+    def _check_memory(
+        self, store: dict, key: str, limit: int, window: int
+    ) -> bool:
+        """Fallback in-memory rate check."""
+        store[key] = _clean(store[key], window)
+        if len(store[key]) >= limit:
+            return False
+        store[key].append(time.time())
+        return True
 
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        # Skip rate limiting during tests
         if settings.APP_ENV == "testing":
             return await call_next(request)
 
         client_ip = request.client.host if request.client else "unknown"
         path = request.url.path
-        now = time.time()
+        is_auth = self._is_auth_endpoint(path)
 
-        # Check auth-specific rate limit
-        if self._is_auth_endpoint(path):
-            self._auth_requests[client_ip] = self._clean_old_requests(
-                self._auth_requests[client_ip], self.auth_window
-            )
-            if len(self._auth_requests[client_ip]) >= self.auth_rate:
-                return JSONResponse(
-                    status_code=429,
-                    content={
-                        "success": False,
-                        "message": "Too many requests. Please try again later.",
-                        "errors": [],
-                    },
-                )
-            self._auth_requests[client_ip].append(now)
+        # Try Redis first, fall back to memory
+        redis_available = True
+        try:
+            if is_auth:
+                auth_key = f"auth:{client_ip}"
+                allowed = await self._check_redis(auth_key, self.auth_rate, self.auth_window)
+                if not allowed:
+                    return _rate_limit_response()
 
-        # Check general rate limit
-        self._general_requests[client_ip] = self._clean_old_requests(
-            self._general_requests[client_ip], self.general_window
-        )
-        if len(self._general_requests[client_ip]) >= self.general_rate:
-            return JSONResponse(
-                status_code=429,
-                content={
-                    "success": False,
-                    "message": "Too many requests. Please try again later.",
-                    "errors": [],
-                },
-            )
-        self._general_requests[client_ip].append(now)
+            gen_key = f"gen:{client_ip}"
+            allowed = await self._check_redis(gen_key, self.general_rate, self.general_window)
+            if not allowed:
+                return _rate_limit_response()
 
-        response = await call_next(request)
-        return response
+        except Exception:
+            redis_available = False
+
+        if not redis_available:
+            # Fallback to in-memory
+            if is_auth:
+                if not self._check_memory(
+                    _fallback_auth, client_ip, self.auth_rate, self.auth_window
+                ):
+                    return _rate_limit_response()
+            if not self._check_memory(
+                _fallback_general, client_ip, self.general_rate, self.general_window
+            ):
+                return _rate_limit_response()
+
+        return await call_next(request)
+
+
+def _rate_limit_response() -> JSONResponse:
+    return JSONResponse(
+        status_code=429,
+        content={
+            "success": False,
+            "message": "Too many requests. Please try again later.",
+            "errors": [],
+        },
+    )

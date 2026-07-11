@@ -1,0 +1,41 @@
+# Celery worker image — same dependencies as backend, different CMD
+# ─── Stage 1: Build ──────────────────────────────────────────────────────────
+FROM python:3.12-slim AS builder
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY backend/requirements.txt .
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
+
+
+# ─── Stage 2: Worker ─────────────────────────────────────────────────────────
+FROM python:3.12-slim AS worker
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /app/wheels /wheels
+COPY --from=builder /app/requirements.txt .
+RUN pip install --no-cache /wheels/*
+
+COPY backend/app /app/app
+
+RUN groupadd -r celeryuser && useradd -r -g celeryuser -d /app -s /sbin/nologin celeryuser
+RUN mkdir -p /app/uploads && chown -R celeryuser:celeryuser /app
+
+USER celeryuser
+
+# Default: start all queues. Override via CMD for dedicated queue workers.
+CMD ["celery", "-A", "app.core.celery_app", "worker", \
+     "--loglevel=info", \
+     "--queues=default,ai,email,cleanup", \
+     "--concurrency=2", \
+     "--max-tasks-per-child=50"]

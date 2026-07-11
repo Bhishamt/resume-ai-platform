@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Your weekly career summary{% endblock %}
+{% block content %}
+<h1>Weekly Career Summary 📊</h1>
+<p>Hi {{ full_name }}, here's a summary of your career progress over the past 7 days.</p>
+
+<hr class="divider" />
+
+<p style="color: #94a3b8; font-size: 14px;">Keep building momentum! Consistent resume optimization leads to better job matches and more interview opportunities.</p>
+
+<div style="text-align: center;">
+  <a href="{{ dashboard_url }}" class="btn">View Full Dashboard →</a>
+</div>
+
+<hr class="divider" />
+
+<p style="font-size: 13px; color: #64748b;">
+  💡 <strong style="color: #94a3b8;">Tip of the week:</strong> Tailor your resume for each job application by incorporating keywords directly from the job description. Our job matching tool makes this easy.
+</p>
+
+<hr class="divider" />
+
+<p style="font-size: 12px; color: #475569; text-align: center;">
+  To unsubscribe from weekly summaries, update your <a href="{{ dashboard_url }}/settings" style="color: #6366f1;">notification preferences</a>.
+</p>
+{% endblock %}

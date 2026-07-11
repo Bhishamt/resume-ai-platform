@@ -1,94 +1,88 @@
-import os
-import uuid
-import shutil
-from pathlib import Path
-from fastapi import UploadFile
-from app.core.config import settings
-from app.core.exceptions import BadRequestError
+"""Storage service — thin façade over the pluggable storage backend.
 
-ALLOWED_EXTENSIONS = {".pdf", ".docx"}
-ALLOWED_MIME_TYPES = {
-    "application/pdf",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-}
+Existing callers import from this module unchanged. The backend is selected
+by STORAGE_BACKEND env var (local | s3) via the storage factory.
+
+Public API (preserved):
+    validate_file(file: UploadFile) -> None
+    save_file(file: UploadFile, user_id: UUID) -> tuple[str, str]
+    delete_file(storage_path: str) -> None
+"""
+
+import logging
+import os
+from uuid import UUID
+
+from fastapi import UploadFile
+
+from app.storage.storage_factory import get_storage
+
+logger = logging.getLogger(__name__)
+
 
 def validate_file(file: UploadFile) -> None:
-    """Validate file extension, MIME type, and size to secure uploads."""
-    filename = file.filename or ""
-    ext = os.path.splitext(filename)[1].lower()
-    
-    # 1. Validate extension
-    if ext not in ALLOWED_EXTENSIONS:
-        raise BadRequestError(f"Unsupported file extension: {ext}. Only PDF and DOCX are allowed.")
-    
-    # 2. Validate MIME type
-    if file.content_type not in ALLOWED_MIME_TYPES:
-        raise BadRequestError(f"Unsupported MIME type: {file.content_type}. Only PDF and DOCX are allowed.")
+    """Validate file extension, MIME type, and size.
 
-    # 3. Validate file size (via file descriptor size check, if possible)
-    # Since UploadFile might be a SpooledTemporaryFile, we check size via seek/tell
-    try:
-        file.file.seek(0, os.SEEK_END)
-        size = file.file.tell()
-        file.file.seek(0)  # Reset to start
-        
-        if size > settings.MAX_UPLOAD_SIZE:
-            max_mb = settings.MAX_UPLOAD_SIZE / (1024 * 1024)
-            raise BadRequestError(f"File size exceeds the limit of {max_mb:.1f} MB.")
-    except Exception as e:
-        if isinstance(e, BadRequestError):
-            raise e
-        # If size check fails, continue but let limit be validated during write or trust request headers
-        pass
+    Delegates to the storage provider's validation so rules are consistent
+    regardless of whether files go to local disk or S3.
+    """
+    size = _probe_size(file)
+    storage = get_storage()
+    storage.validate_file(
+        filename=file.filename or "",
+        content_type=file.content_type,
+        size=size,
+    )
 
-def save_file(file: UploadFile, user_id: uuid.UUID) -> tuple[str, str]:
-    """Save upload file to a user-specific folder with a unique name.
+
+def save_file(file: UploadFile, user_id: UUID) -> tuple[str, str]:
+    """Save an uploaded file using the configured storage backend.
 
     Returns:
-        tuple[str, str]: (stored_filename, absolute_storage_path)
+        (stored_filename, storage_path_or_key)
     """
-    # Validate file parameters
-    validate_file(file)
+    storage = get_storage()
+    stored_filename, storage_path = storage.save(
+        file_obj=file.file,
+        filename=file.filename or "resume",
+        user_id=user_id,
+    )
+    logger.info(
+        "save_file: user=%s stored_as=%s backend=%s",
+        user_id, stored_filename, type(storage).__name__,
+    )
+    return stored_filename, storage_path
 
-    # Prevent path traversal: secure folder layout
-    upload_dir = Path(settings.UPLOAD_DIR).resolve()
-    user_dir = (upload_dir / str(user_id)).resolve()
-
-    # Ensure directories exist
-    user_dir.mkdir(parents=True, exist_ok=True)
-
-    # Generate a unique stored name
-    original_filename = file.filename or "resume"
-    ext = os.path.splitext(original_filename)[1].lower()
-    stored_filename = f"{uuid.uuid4()}{ext}"
-    
-    storage_path = user_dir / stored_filename
-
-    # Double check path traversal safety
-    if not str(storage_path.resolve()).startswith(str(upload_dir)):
-        raise BadRequestError("Path traversal attempt detected.")
-
-    # Write file content
-    try:
-        with open(storage_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-    except Exception as e:
-        raise BadRequestError(f"Failed to write file to storage: {str(e)}")
-
-    return stored_filename, str(storage_path)
 
 def delete_file(storage_path: str) -> None:
-    """Delete a file from disk if it exists."""
-    path = Path(storage_path).resolve()
-    # Check that we only delete files inside the configured upload directory
-    upload_dir = Path(settings.UPLOAD_DIR).resolve()
-    if not str(path).startswith(str(upload_dir)):
-        # Prevent deletion outside the sandbox
+    """Delete a file from the configured storage backend.
+
+    Silently succeeds if the file does not exist.
+    """
+    if not storage_path:
         return
-        
-    if path.is_file():
-        try:
-            path.unlink()
-        except OSError:
-            # Log issue but don't fail transaction
-            pass
+    storage = get_storage()
+    storage.delete(storage_path)
+    logger.info("delete_file: %s", storage_path)
+
+
+def get_file_url(storage_path: str) -> str:
+    """Return a URL to access a stored file.
+
+    For local storage: a relative API path.
+    For S3: a pre-signed URL.
+    """
+    storage = get_storage()
+    return storage.get_url(storage_path)
+
+
+def _probe_size(file: UploadFile) -> int:
+    """Determine file size from an UploadFile without consuming the stream."""
+    try:
+        pos = file.file.tell()
+        file.file.seek(0, os.SEEK_END)
+        size = file.file.tell()
+        file.file.seek(pos)
+        return size
+    except Exception:
+        return 0
