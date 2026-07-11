@@ -186,13 +186,13 @@ export default function JobMatching() {
   }
 
   // Pre-calculate Radar Chart Data
-  const radarData = React.useMemo(() => activeReport?.score_explanations
+  const radarData = activeReport?.score_explanations
     ? Object.keys(activeReport.score_explanations).map((key) => ({
         subject: key,
         Score: activeReport.score_explanations[key].percentage,
         fullMark: 100
       }))
-    : [], [activeReport]);
+    : [];
 
   const getPriorityColor = (prio) => {
     if (prio === "High") return "text-red-400 border-red-500/20 bg-red-500/5";

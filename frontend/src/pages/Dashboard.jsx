@@ -22,7 +22,6 @@ import {
   Cell
 } from "recharts";
 import {
-  Loader2,
   Briefcase,
   Award,
   ChevronUp,
@@ -307,17 +306,17 @@ export default function Dashboard() {
   const COLORS = ["#ffffff", "#e4e4e7", "#a1a1aa", "#71717a", "#3f3f46"];
 
   // Pie chart dataset mapping
-  const pieData = React.useMemo(() => Object.keys(stats.most_requested_ai_features || {}).map(key => ({
+  const pieData = Object.keys(stats.most_requested_ai_features || {}).map(key => ({
     name: key.replace("_", " ").toUpperCase(),
     value: stats.most_requested_ai_features[key]
-  })), [stats.most_requested_ai_features]);
+  }));
 
   // Skills radar dataset mapping
-  const radarData = React.useMemo(() => (skills.top_skills || []).map(item => ({
+  const radarData = (skills.top_skills || []).map(item => ({
     subject: item.skill,
     A: item.count,
     fullMark: Math.max(...(skills.top_skills || []).map(i => i.count), 1) + 2
-  })), [skills.top_skills]);
+  }));
 
   // Render Widget based on its ID
   const renderWidget = (widgetId, idx) => {
