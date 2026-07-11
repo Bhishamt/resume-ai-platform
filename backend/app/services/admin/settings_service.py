@@ -1,13 +1,13 @@
 """Settings service — read and write system-wide platform configuration."""
 
 import logging
-from typing import List
 from uuid import UUID
 
 from sqlalchemy.orm import Session
 
 from app.repositories import admin_repository
-from app.schemas.admin import BulkSettingsUpdate, SettingResponse, SettingsListResponse
+from app.schemas.admin import (BulkSettingsUpdate, SettingResponse,
+                               SettingsListResponse)
 from app.services.admin import log_service
 
 logger = logging.getLogger(__name__)

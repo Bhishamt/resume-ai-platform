@@ -9,27 +9,17 @@ from uuid import UUID
 import jwt
 from sqlalchemy.orm import Session
 
-from app.core.exceptions import (
-    AuthenticationError,
-    BadRequestError,
-    ConflictError,
-)
-from app.core.security import hash_password, validate_password_strength, verify_password
+from app.core.exceptions import (AuthenticationError, BadRequestError,
+                                 ConflictError)
+from app.core.security import (hash_password, validate_password_strength,
+                               verify_password)
 from app.repositories import user_repository
-from app.schemas.user import (
-    ForgotPasswordRequest,
-    ResetPasswordRequest,
-    TokenResponse,
-    UserLogin,
-    UserRegister,
-    UserResponse,
-)
-from app.utils.jwt_utils import (
-    create_access_token,
-    create_password_reset_token,
-    create_refresh_token,
-    decode_token,
-)
+from app.schemas.user import (ForgotPasswordRequest, ResetPasswordRequest,
+                              TokenResponse, UserLogin, UserRegister,
+                              UserResponse)
+from app.utils.jwt_utils import (create_access_token,
+                                 create_password_reset_token,
+                                 create_refresh_token, decode_token)
 
 logger = logging.getLogger(__name__)
 

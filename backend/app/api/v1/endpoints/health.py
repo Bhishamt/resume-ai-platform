@@ -51,7 +51,9 @@ async def health_detailed() -> JSONResponse:
     # ── Database ──────────────────────────────────────────────────────────────
     try:
         import sqlalchemy
+
         from app.database.base import SessionLocal
+
         db = SessionLocal()
         db.execute(sqlalchemy.text("SELECT 1"))
         db.close()
@@ -64,6 +66,7 @@ async def health_detailed() -> JSONResponse:
     # ── Redis ─────────────────────────────────────────────────────────────────
     try:
         from app.core.redis_client import ping_redis
+
         redis_ok = await ping_redis()
         if redis_ok:
             checks["redis"] = {"status": "healthy"}
@@ -78,6 +81,7 @@ async def health_detailed() -> JSONResponse:
     # ── Celery ────────────────────────────────────────────────────────────────
     try:
         from app.core.celery_app import celery_app
+
         inspect = celery_app.control.inspect(timeout=2.0)
         stats = inspect.stats()
         worker_count = len(stats) if stats else 0
@@ -94,6 +98,7 @@ async def health_detailed() -> JSONResponse:
     # ── Storage ───────────────────────────────────────────────────────────────
     try:
         from pathlib import Path
+
         backend = settings.STORAGE_BACKEND
         if backend == "local":
             upload_dir = Path(settings.UPLOAD_DIR)

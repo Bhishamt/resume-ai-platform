@@ -13,7 +13,9 @@ import jwt
 from app.core.config import settings
 
 
-def create_access_token(subject: Union[str, Any], expires_delta: timedelta | None = None) -> str:
+def create_access_token(
+    subject: Union[str, Any], expires_delta: timedelta | None = None
+) -> str:
     """Create a JWT access token with a unique jti for blacklist support."""
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -94,6 +96,7 @@ async def revoke_token(token: str) -> bool:
             return True
 
         from app.core.redis_client import blacklist_token
+
         return await blacklist_token(jti, remaining_seconds + 60)  # +60s grace period
 
     except Exception:
@@ -111,4 +114,5 @@ async def is_token_revoked(payload: dict) -> bool:
         return False  # Legacy tokens without jti are not revocable
 
     from app.core.redis_client import is_token_blacklisted
+
     return await is_token_blacklisted(jti)

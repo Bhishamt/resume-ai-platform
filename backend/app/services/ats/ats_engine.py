@@ -1,20 +1,23 @@
 import logging
+
 from sqlalchemy.orm import Session
+
 from app.models.resume import Resume
-from app.services.parser.parser_factory import ParserFactory
-from app.services.ats.section_detector import SectionDetector
-from app.services.ats.keyword_analyzer import KeywordAnalyzer
 from app.services.ats.formatting_checker import FormattingChecker
-from app.services.ats.score_calculator import ScoreCalculator
+from app.services.ats.keyword_analyzer import KeywordAnalyzer
 from app.services.ats.recommendation_engine import RecommendationEngine
+from app.services.ats.score_calculator import ScoreCalculator
+from app.services.ats.section_detector import SectionDetector
+from app.services.parser.parser_factory import ParserFactory
 
 logger = logging.getLogger(__name__)
+
 
 class AtsEngine:
     @classmethod
     def analyze_resume(cls, db: Session, resume: Resume) -> dict:
         """Analyze a resume, ensuring text is parsed/cached, running deterministic engines.
-        
+
         Returns:
             dict with scores, strengths, weaknesses, missing_keywords, suggestions
         """
@@ -23,17 +26,21 @@ class AtsEngine:
         if not parsed_text:
             logger.info(f"Parsing resume on-the-fly for analysis: {resume.id}")
             try:
-                parser = ParserFactory.get_parser(resume.original_filename, resume.file_type)
+                parser = ParserFactory.get_parser(
+                    resume.original_filename, resume.file_type
+                )
                 parsed_data = parser.parse(resume.storage_path)
                 parsed_text = parsed_data.get("raw_text", "")
-                
+
                 # Cache the parsed text back to resume
                 resume.parsed_text = parsed_text
                 db.add(resume)
                 db.commit()
                 db.refresh(resume)
             except Exception as e:
-                logger.error(f"Failed to parse resume file {resume.storage_path}: {str(e)}")
+                logger.error(
+                    f"Failed to parse resume file {resume.storage_path}: {str(e)}"
+                )
                 parsed_text = ""
 
         # Handle empty/unparsable resume text gracefully
@@ -49,9 +56,13 @@ class AtsEngine:
                 "projects_score": 0,
                 "grammar_score": 0,
                 "strengths": ["Clear layout structure"],
-                "weaknesses": ["Unable to extract readable text content from the file."],
+                "weaknesses": [
+                    "Unable to extract readable text content from the file."
+                ],
                 "missing_keywords": [],
-                "suggestions": ["Please verify the uploaded file is not password-protected, scanned, or empty, and re-upload."]
+                "suggestions": [
+                    "Please verify the uploaded file is not password-protected, scanned, or empty, and re-upload."
+                ],
             }
 
         # 2. Run Section Detector
@@ -71,7 +82,9 @@ class AtsEngine:
         keyword_reasons = keyword_res.get("reasons", [])
 
         # 4. Run Formatting Checker
-        formatting_res = FormattingChecker.check_formatting(parsed_text, detected_sections)
+        formatting_res = FormattingChecker.check_formatting(
+            parsed_text, detected_sections
+        )
         formatting_score = formatting_res["score"]
         formatting_details = formatting_res["details"]
         formatting_feedback = formatting_res["feedback"]
@@ -80,32 +93,40 @@ class AtsEngine:
 
         # 5. Run Experience Evaluator
         action_verbs_found = found_keywords.get("Action Verbs", [])
-        experience_score, years_of_exp, experience_weighted, experience_reasons = \
-            ScoreCalculator.calculate_experience_score_explainable(parsed_text, action_verbs_found)
+        experience_score, years_of_exp, experience_weighted, experience_reasons = (
+            ScoreCalculator.calculate_experience_score_explainable(
+                parsed_text, action_verbs_found
+            )
+        )
 
         # 6. Run Projects Evaluator
         tech_skills_found = found_keywords.get("Technical Skills", [])
-        projects_score, projects_weighted, projects_reasons = \
-            ScoreCalculator.calculate_projects_score_explainable(parsed_text, tech_skills_found)
+        projects_score, projects_weighted, projects_reasons = (
+            ScoreCalculator.calculate_projects_score_explainable(
+                parsed_text, tech_skills_found
+            )
+        )
 
         # 7. Run Education Evaluator
-        education_score, education_weighted, education_reasons = \
+        education_score, education_weighted, education_reasons = (
             ScoreCalculator.calculate_education_score_explainable(parsed_text)
+        )
 
         # 8. Run Grammar Evaluator
-        grammar_score, grammar_weighted, grammar_reasons = \
+        grammar_score, grammar_weighted, grammar_reasons = (
             ScoreCalculator.calculate_grammar_score_explainable(parsed_text)
+        )
         grammar_feedback = [r["rule"] for r in grammar_reasons]
 
         # 9. Calculate final weighted score
         ats_score = (
-            keyword_weighted +
-            experience_weighted +
-            formatting_weighted +
-            section_weighted +
-            projects_weighted +
-            education_weighted +
-            grammar_weighted
+            keyword_weighted
+            + experience_weighted
+            + formatting_weighted
+            + section_weighted
+            + projects_weighted
+            + education_weighted
+            + grammar_weighted
         )
         # In this phase, we map resume_score directly to the calculated ATS score
         resume_score = ats_score
@@ -116,44 +137,44 @@ class AtsEngine:
                 "score": keyword_weighted,
                 "max_score": 30,
                 "percentage": keyword_score,
-                "reasons": keyword_reasons
+                "reasons": keyword_reasons,
             },
             "Experience": {
                 "score": experience_weighted,
                 "max_score": 20,
                 "percentage": experience_score,
-                "reasons": experience_reasons
+                "reasons": experience_reasons,
             },
             "Formatting": {
                 "score": formatting_weighted,
                 "max_score": 15,
                 "percentage": formatting_score,
-                "reasons": formatting_reasons
+                "reasons": formatting_reasons,
             },
             "Sections": {
                 "score": section_weighted,
                 "max_score": 10,
                 "percentage": section_score,
-                "reasons": section_reasons
+                "reasons": section_reasons,
             },
             "Projects": {
                 "score": projects_weighted,
                 "max_score": 10,
                 "percentage": projects_score,
-                "reasons": projects_reasons
+                "reasons": projects_reasons,
             },
             "Education": {
                 "score": education_weighted,
                 "max_score": 10,
                 "percentage": education_score,
-                "reasons": education_reasons
+                "reasons": education_reasons,
             },
             "Grammar": {
                 "score": grammar_weighted,
                 "max_score": 5,
                 "percentage": grammar_score,
-                "reasons": grammar_reasons
-            }
+                "reasons": grammar_reasons,
+            },
         }
 
         # 11. Generate strengths, weaknesses, and suggestions
@@ -164,9 +185,9 @@ class AtsEngine:
             "projects_score": projects_score,
             "education_score": education_score,
             "grammar_score": grammar_score,
-            "section_score": section_score
+            "section_score": section_score,
         }
-        
+
         recommendations = RecommendationEngine.generate_recommendations(
             category_scores=category_scores,
             detected_sections=detected_sections,
@@ -175,7 +196,7 @@ class AtsEngine:
             missing_keywords=missing_keywords,
             formatting_details=formatting_details,
             formatting_feedback=formatting_feedback,
-            grammar_feedback=grammar_feedback
+            grammar_feedback=grammar_feedback,
         )
 
         return {
@@ -191,5 +212,5 @@ class AtsEngine:
             "weaknesses": recommendations["weaknesses"],
             "missing_keywords": missing_keywords,
             "suggestions": recommendations["suggestions"],
-            "scoring_explanations": scoring_explanations
+            "scoring_explanations": scoring_explanations,
         }

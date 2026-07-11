@@ -20,7 +20,12 @@ def configure_logging() -> None:
             from pythonjsonlogger import jsonlogger
 
             class CustomJsonFormatter(jsonlogger.JsonFormatter):
-                def add_fields(self, log_record: dict, record: logging.LogRecord, message_dict: dict) -> None:
+                def add_fields(
+                    self,
+                    log_record: dict,
+                    record: logging.LogRecord,
+                    message_dict: dict,
+                ) -> None:
                     super().add_fields(log_record, record, message_dict)
                     log_record["level"] = record.levelname
                     log_record["service"] = "resume-ai-backend"

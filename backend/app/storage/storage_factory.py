@@ -30,10 +30,12 @@ def get_storage() -> BaseStorage:
 
     if backend == "s3":
         from app.storage.s3_storage import S3Storage
+
         _storage_instance = S3Storage()
         logger.info("Storage backend: S3 (bucket=%s)", settings.AWS_BUCKET_NAME)
     else:
         from app.storage.local_storage import LocalStorage
+
         _storage_instance = LocalStorage()
         logger.info("Storage backend: Local (dir=%s)", settings.UPLOAD_DIR)
 

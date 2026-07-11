@@ -1,23 +1,19 @@
-from typing import List
 from uuid import UUID
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_current_active_user, get_db
 from app.models.user import User
+from app.schemas.ai import (AICareerRequest, AICoverLetterRequest,
+                            AIFeedbackResponse, AIImproveProjectsRequest,
+                            AIImproveSummaryRequest, AIInterviewRequest,
+                            AIReviewRequest)
 from app.schemas.user import APIResponse
-from app.schemas.ai import (
-    AIReviewRequest,
-    AICoverLetterRequest,
-    AIImproveSummaryRequest,
-    AIImproveProjectsRequest,
-    AIInterviewRequest,
-    AICareerRequest,
-    AIFeedbackResponse,
-)
 from app.services.ai.ai_service import ai_service
 
 router = APIRouter()
+
 
 @router.post(
     "/review",
@@ -35,20 +31,19 @@ async def review_resume(
             db=db,
             user_id=current_user.id,
             resume_id=payload.resume_id,
-            analysis_id=payload.analysis_id
+            analysis_id=payload.analysis_id,
         )
         return APIResponse(
-            success=True,
-            message="Resume review generated successfully.",
-            data=feedback
+            success=True, message="Resume review generated successfully.", data=feedback
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An error occurred while generating resume review: {str(e)}"
+            detail=f"An error occurred while generating resume review: {str(e)}",
         )
+
 
 @router.post(
     "/cover-letter",
@@ -69,20 +64,19 @@ async def generate_cover_letter(
             job_description_id=payload.job_description_id,
             company_name=payload.company_name,
             job_title=payload.job_title,
-            job_text=payload.job_text
+            job_text=payload.job_text,
         )
         return APIResponse(
-            success=True,
-            message="Cover letters generated successfully.",
-            data=letters
+            success=True, message="Cover letters generated successfully.", data=letters
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An error occurred while generating cover letters: {str(e)}"
+            detail=f"An error occurred while generating cover letters: {str(e)}",
         )
+
 
 @router.post(
     "/improve-summary",
@@ -97,22 +91,21 @@ async def improve_summary(
 ):
     try:
         data = await ai_service.improve_summary(
-            db=db,
-            user_id=current_user.id,
-            resume_id=payload.resume_id
+            db=db, user_id=current_user.id, resume_id=payload.resume_id
         )
         return APIResponse(
             success=True,
             message="Summary suggestions generated successfully.",
-            data=data
+            data=data,
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An error occurred while generating summary improvements: {str(e)}"
+            detail=f"An error occurred while generating summary improvements: {str(e)}",
         )
+
 
 @router.post(
     "/improve-projects",
@@ -127,22 +120,21 @@ async def improve_projects(
 ):
     try:
         data = await ai_service.improve_projects(
-            db=db,
-            user_id=current_user.id,
-            resume_id=payload.resume_id
+            db=db, user_id=current_user.id, resume_id=payload.resume_id
         )
         return APIResponse(
             success=True,
             message="Project improvements generated successfully.",
-            data=data
+            data=data,
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An error occurred while improving project descriptions: {str(e)}"
+            detail=f"An error occurred while improving project descriptions: {str(e)}",
         )
+
 
 @router.post(
     "/interview",
@@ -160,20 +152,21 @@ async def prepare_interview(
             db=db,
             user_id=current_user.id,
             resume_id=payload.resume_id,
-            job_description_id=payload.job_description_id
+            job_description_id=payload.job_description_id,
         )
         return APIResponse(
             success=True,
             message="Interview questions generated successfully.",
-            data=data
+            data=data,
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An error occurred while generating interview prep: {str(e)}"
+            detail=f"An error occurred while generating interview prep: {str(e)}",
         )
+
 
 @router.post(
     "/career",
@@ -188,22 +181,19 @@ async def suggest_career(
 ):
     try:
         data = await ai_service.suggest_career(
-            db=db,
-            user_id=current_user.id,
-            resume_id=payload.resume_id
+            db=db, user_id=current_user.id, resume_id=payload.resume_id
         )
         return APIResponse(
-            success=True,
-            message="Career guidance generated successfully.",
-            data=data
+            success=True, message="Career guidance generated successfully.", data=data
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An error occurred while generating career suggestions: {str(e)}"
+            detail=f"An error occurred while generating career suggestions: {str(e)}",
         )
+
 
 @router.get(
     "/history",
@@ -219,8 +209,9 @@ def get_ai_history(
     return APIResponse(
         success=True,
         message="AI history retrieved successfully.",
-        data=[h.model_dump(mode="json") for h in history_responses]
+        data=[h.model_dump(mode="json") for h in history_responses],
     )
+
 
 @router.delete(
     "/history/{id}",
@@ -232,13 +223,12 @@ def delete_ai_history(
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db),
 ):
-    deleted = ai_service.delete_history_item(db=db, user_id=current_user.id, feedback_id=id)
+    deleted = ai_service.delete_history_item(
+        db=db, user_id=current_user.id, feedback_id=id
+    )
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="AI feedback log not found or unauthorized."
+            detail="AI feedback log not found or unauthorized.",
         )
-    return APIResponse(
-        success=True,
-        message="AI feedback log deleted successfully."
-    )
+    return APIResponse(success=True, message="AI feedback log deleted successfully.")

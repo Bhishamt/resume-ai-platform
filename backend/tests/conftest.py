@@ -7,12 +7,12 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.core.config import settings
+
 settings.APP_ENV = "testing"
 
-from app.api.dependencies import get_db
-from app.database.base import Base
-from app.main import app
-
+from app.api.dependencies import get_db  # noqa: E402
+from app.database.base import Base  # noqa: E402
+from app.main import app  # noqa: E402
 
 # Use in-memory SQLite for testing
 SQLALCHEMY_DATABASE_URL = "sqlite://"

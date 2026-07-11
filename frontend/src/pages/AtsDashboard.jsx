@@ -93,11 +93,24 @@ export default function AtsDashboard() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#050505] text-white">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-10 w-10 animate-spin text-white/50" />
-          <p className="text-sm text-white/55">Running ATS deterministic audit...</p>
-        </div>
+      <div className="min-h-screen bg-[#050505] text-white">
+        <div className="h-24" />
+        <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 bg-white/5 rounded-full animate-pulse" />
+              <div>
+                <div className="h-6 w-48 bg-white/5 rounded animate-pulse mb-2" />
+                <div className="h-3 w-32 bg-white/5 rounded animate-pulse" />
+              </div>
+            </div>
+            <div className="h-10 w-32 bg-white/5 rounded-full animate-pulse" />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-1 p-8 h-80 bg-white/[0.02] border border-white/5 rounded-xl animate-pulse" />
+            <div className="lg:col-span-2 p-8 h-80 bg-white/[0.02] border border-white/5 rounded-xl animate-pulse" />
+          </div>
+        </main>
       </div>
     );
   }

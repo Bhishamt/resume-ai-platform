@@ -1,11 +1,13 @@
-from typing import List, Dict, Any
+from typing import Any, Dict
 from uuid import UUID
+
 from sqlalchemy.orm import Session
 
-from app.models.resume import Resume
 from app.models.analysis_report import AnalysisReport
 from app.models.job_match import JobMatch
+from app.models.resume import Resume
 from app.services.dashboard.analytics_service import AnalyticsService
+
 
 class RecommendationService:
     @staticmethod
@@ -17,23 +19,33 @@ class RecommendationService:
         # 1. Fetch skills analytics
         skills_data = AnalyticsService.get_user_skills_analytics(db, user_id)
         missing_skills_list = [item["skill"] for item in skills_data["missing_skills"]]
-        
+
         # 2. Technologies to learn
-        tech_to_learn = missing_skills_list[:5] if missing_skills_list else ["Docker", "Kubernetes", "TypeScript", "System Design", "AWS"]
+        tech_to_learn = (
+            missing_skills_list[:5]
+            if missing_skills_list
+            else ["Docker", "Kubernetes", "TypeScript", "System Design", "AWS"]
+        )
 
         # 3. Calculate ATS Improvement over time
-        reports = db.query(AnalysisReport).join(Resume).filter(
-            Resume.user_id == user_id
-        ).order_by(AnalysisReport.created_at.asc()).all()
+        reports = (
+            db.query(AnalysisReport)
+            .join(Resume)
+            .filter(Resume.user_id == user_id)
+            .order_by(AnalysisReport.created_at.asc())
+            .all()
+        )
 
-        ats_evaluation = "Upload and analyze your resume to track ATS improvement over time."
+        ats_evaluation = (
+            "Upload and analyze your resume to track ATS improvement over time."
+        )
         ats_trend_direction = "stable"
-        
+
         if len(reports) >= 2:
             earliest_score = reports[0].ats_score
             latest_score = reports[-1].ats_score
             diff = latest_score - earliest_score
-            
+
             if diff > 0:
                 ats_evaluation = f"Great work! Your ATS compatibility score has improved by {diff} points since your first analysis."
                 ats_trend_direction = "improving"
@@ -47,9 +59,9 @@ class RecommendationService:
             ats_evaluation = f"Your current ATS score is {reports[0].ats_score} points. Upload modified resumes to compare improvements."
 
         # 4. Job Match & Interview Readiness
-        matches = db.query(JobMatch).join(Resume).filter(
-            Resume.user_id == user_id
-        ).all()
+        matches = (
+            db.query(JobMatch).join(Resume).filter(Resume.user_id == user_id).all()
+        )
 
         readiness_status = "Not Evaluated"
         readiness_score = 0
@@ -73,22 +85,28 @@ class RecommendationService:
         # 5. General Career growth suggestions
         career_suggestions = []
         if tech_to_learn:
-            career_suggestions.append(f"Incorporate missing skills: {', '.join(tech_to_learn[:3])} into your experience bullet points.")
+            career_suggestions.append(
+                f"Incorporate missing skills: {', '.join(tech_to_learn[:3])} into your experience bullet points."
+            )
         if readiness_status == "Low" or readiness_status == "Medium":
-            career_suggestions.append("Apply to roles that prioritize your top matching skills rather than missing tech.")
-        career_suggestions.append("Update certifications section on your resume as you master new skills.")
+            career_suggestions.append(
+                "Apply to roles that prioritize your top matching skills rather than missing tech."
+            )
+        career_suggestions.append(
+            "Update certifications section on your resume as you master new skills."
+        )
 
         return {
             "most_common_missing_skills": missing_skills_list[:6],
             "technologies_to_learn": tech_to_learn,
             "ats_improvement": {
                 "evaluation": ats_evaluation,
-                "direction": ats_trend_direction
+                "direction": ats_trend_direction,
             },
             "interview_readiness": {
                 "status": readiness_status,
                 "score": readiness_score,
-                "description": readiness_text
+                "description": readiness_text,
             },
-            "career_growth_suggestions": career_suggestions
+            "career_growth_suggestions": career_suggestions,
         }

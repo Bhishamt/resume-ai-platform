@@ -1,13 +1,10 @@
 """Tests for health check endpoints."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from fastapi.testclient import TestClient
 
 from app.core.config import settings
-settings.APP_ENV = "testing"
 
-from app.main import app  # noqa: E402
+settings.APP_ENV = "testing"
 
 
 class TestBasicHealthCheck:
@@ -43,8 +40,9 @@ class TestDetailedHealthCheck:
 
     def test_detailed_health_returns_checks_dict(self, client):
         """Detailed health check returns a checks dict."""
-        with patch("app.core.redis_client.ping_redis", new_callable=AsyncMock) as mock_ping, \
-             patch("app.core.celery_app.celery_app") as mock_celery:
+        with patch(
+            "app.core.redis_client.ping_redis", new_callable=AsyncMock
+        ) as mock_ping, patch("app.core.celery_app.celery_app") as mock_celery:
             mock_ping.return_value = True
             mock_inspect = MagicMock()
             mock_inspect.stats.return_value = {"worker@hostname": {}}
@@ -59,7 +57,9 @@ class TestDetailedHealthCheck:
 
     def test_detailed_health_includes_uptime(self, client):
         """Detailed health check includes uptime_seconds field."""
-        with patch("app.core.redis_client.ping_redis", new_callable=AsyncMock) as mock_ping:
+        with patch(
+            "app.core.redis_client.ping_redis", new_callable=AsyncMock
+        ) as mock_ping:
             mock_ping.return_value = True
 
             response = client.get("/api/v1/health/detailed")
@@ -71,7 +71,9 @@ class TestDetailedHealthCheck:
 
     def test_detailed_health_db_check_present(self, client):
         """Detailed health check includes database status."""
-        with patch("app.core.redis_client.ping_redis", new_callable=AsyncMock) as mock_ping:
+        with patch(
+            "app.core.redis_client.ping_redis", new_callable=AsyncMock
+        ) as mock_ping:
             mock_ping.return_value = False
 
             response = client.get("/api/v1/health/detailed")
@@ -81,7 +83,9 @@ class TestDetailedHealthCheck:
 
     def test_detailed_health_redis_check_present(self, client):
         """Detailed health check includes redis status."""
-        with patch("app.core.redis_client.ping_redis", new_callable=AsyncMock) as mock_ping:
+        with patch(
+            "app.core.redis_client.ping_redis", new_callable=AsyncMock
+        ) as mock_ping:
             mock_ping.return_value = False
 
             response = client.get("/api/v1/health/detailed")
@@ -91,8 +95,9 @@ class TestDetailedHealthCheck:
 
     def test_detailed_health_returns_503_on_failure(self, client):
         """Detailed health returns 503 when a critical dependency is down."""
-        with patch("app.core.redis_client.ping_redis", new_callable=AsyncMock) as mock_ping, \
-             patch("app.database.base.SessionLocal") as mock_session:
+        with patch(
+            "app.core.redis_client.ping_redis", new_callable=AsyncMock
+        ) as mock_ping, patch("app.database.base.SessionLocal") as mock_session:
             mock_ping.return_value = False
 
             # Make DB check fail
@@ -128,10 +133,13 @@ class TestSecurityHeaders:
 
     def test_request_id_is_uuid_format(self, client):
         import re
+
         response = client.get("/api/v1/health/")
         request_id = response.headers.get("x-request-id", "")
         uuid_pattern = re.compile(
             r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
             re.IGNORECASE,
         )
-        assert uuid_pattern.match(request_id), f"X-Request-ID is not a UUID: {request_id}"
+        assert uuid_pattern.match(
+            request_id
+        ), f"X-Request-ID is not a UUID: {request_id}"

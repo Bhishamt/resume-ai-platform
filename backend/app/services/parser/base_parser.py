@@ -2,6 +2,7 @@ import abc
 import re
 from typing import TypedDict
 
+
 class ParsedResumeData(TypedDict):
     name: str | None
     email: str | None
@@ -12,6 +13,7 @@ class ParsedResumeData(TypedDict):
     projects: list[str]
     certifications: list[str]
     raw_text: str
+
 
 class BaseParser(abc.ABC):
     """Abstract base class defining the Resume Parser interface."""
@@ -65,16 +67,21 @@ class BaseParser(abc.ABC):
         # Check the first few lines for typical Name pattern: 2-3 capitalized words
         for line in lines[:3]:
             # Skip lines containing common headers or emails/phones
-            if any(kw in line.lower() for kw in ["resume", "cv", "curriculum", "email", "phone", "address"]):
+            if any(
+                kw in line.lower()
+                for kw in ["resume", "cv", "curriculum", "email", "phone", "address"]
+            ):
                 continue
             if "@" in line or any(c.isdigit() for c in line if c in "+-() "):
                 # Skip if it looks like email or phone
                 if len([c for c in line if c.isdigit()]) > 5:
                     continue
             words = line.split()
-            if 1 <= len(words) <= 4 and all(w[0].isupper() for w in words if w.isalpha()):
+            if 1 <= len(words) <= 4 and all(
+                w[0].isupper() for w in words if w.isalpha()
+            ):
                 return line
-        
+
         return lines[0] if lines else None
 
     def _extract_section_keywords(self, text: str, section_type: str) -> list[str]:
@@ -84,30 +91,110 @@ class BaseParser(abc.ABC):
 
         keywords_map = {
             "skills": [
-                "python", "javascript", "react", "fastapi", "django", "flask", "node.js",
-                "html", "css", "tailwind", "sql", "postgresql", "mysql", "mongodb", "redis",
-                "docker", "kubernetes", "aws", "gcp", "azure", "git", "github", "ci/cd",
-                "java", "c++", "c#", "typescript", "graphql", "rest api", "rust", "go",
-                "agile", "scrum", "machine learning", "data analytics", "tensorflow", "pytorch"
+                "python",
+                "javascript",
+                "react",
+                "fastapi",
+                "django",
+                "flask",
+                "node.js",
+                "html",
+                "css",
+                "tailwind",
+                "sql",
+                "postgresql",
+                "mysql",
+                "mongodb",
+                "redis",
+                "docker",
+                "kubernetes",
+                "aws",
+                "gcp",
+                "azure",
+                "git",
+                "github",
+                "ci/cd",
+                "java",
+                "c++",
+                "c#",
+                "typescript",
+                "graphql",
+                "rest api",
+                "rust",
+                "go",
+                "agile",
+                "scrum",
+                "machine learning",
+                "data analytics",
+                "tensorflow",
+                "pytorch",
             ],
             "education": [
-                "bachelor", "master", "phd", "b.sc", "b.s", "m.sc", "m.s", "b.tech", "m.tech",
-                "university", "college", "degree", "diploma", "gpa", "major", "computer science",
-                "engineering", "mathematics", "physics"
+                "bachelor",
+                "master",
+                "phd",
+                "b.sc",
+                "b.s",
+                "m.sc",
+                "m.s",
+                "b.tech",
+                "m.tech",
+                "university",
+                "college",
+                "degree",
+                "diploma",
+                "gpa",
+                "major",
+                "computer science",
+                "engineering",
+                "mathematics",
+                "physics",
             ],
             "experience": [
-                "experience", "work history", "employment", "intern", "developer", "engineer",
-                "architect", "lead", "manager", "director", "consultant", "analyst",
-                "years", "months", "responsibilities", "accomplishments"
+                "experience",
+                "work history",
+                "employment",
+                "intern",
+                "developer",
+                "engineer",
+                "architect",
+                "lead",
+                "manager",
+                "director",
+                "consultant",
+                "analyst",
+                "years",
+                "months",
+                "responsibilities",
+                "accomplishments",
             ],
             "projects": [
-                "project", "portfolio", "personal project", "academic project", "github repository",
-                "designed", "developed", "built", "implemented", "created", "architected"
+                "project",
+                "portfolio",
+                "personal project",
+                "academic project",
+                "github repository",
+                "designed",
+                "developed",
+                "built",
+                "implemented",
+                "created",
+                "architected",
             ],
             "certifications": [
-                "certification", "certified", "aws certified", "pmp", "scrum master", "comptia",
-                "cisco", "ccna", "gcp certified", "udemy", "coursera", "licence"
-            ]
+                "certification",
+                "certified",
+                "aws certified",
+                "pmp",
+                "scrum master",
+                "comptia",
+                "cisco",
+                "ccna",
+                "gcp certified",
+                "udemy",
+                "coursera",
+                "licence",
+            ],
         }
 
         # For skills, scan directly for keywords present in the text
@@ -124,5 +211,5 @@ class BaseParser(abc.ABC):
         for kw in section_keywords:
             if kw in text_lower:
                 found.append(kw)
-        
+
         return sorted(list(set(found)))

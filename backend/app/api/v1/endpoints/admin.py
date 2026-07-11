@@ -34,31 +34,14 @@ from app.api.dependencies import get_admin_user, get_db
 from app.core.exceptions import NotFoundError
 from app.models.user import User
 from app.repositories import admin_repository
-from app.schemas.admin import (
-    AdminLogListResponse,
-    AdminResumeListResponse,
-    AdminResumeResponse,
-    AdminUserListResponse,
-    AdminUserResponse,
-    AdminUserUpdate,
-    AIMonitoringResponse,
-    AnalyticsResponse,
-    BulkSettingsUpdate,
-    DashboardStats,
-    NotificationCreate,
-    NotificationListResponse,
-    PaginatedMeta,
-    SettingsListResponse,
-    SystemHealthResponse,
-)
+from app.schemas.admin import (AdminResumeListResponse, AdminResumeResponse,
+                               AdminUserUpdate, AIMonitoringResponse,
+                               BulkSettingsUpdate, NotificationCreate,
+                               PaginatedMeta, SystemHealthResponse)
 from app.schemas.user import APIResponse
-from app.services.admin import (
-    analytics_service,
-    log_service,
-    notification_service,
-    settings_service,
-    user_management,
-)
+from app.services.admin import (analytics_service, log_service,
+                                notification_service, settings_service,
+                                user_management)
 from app.services.admin.admin_service import get_client_ip
 
 logger = logging.getLogger(__name__)
@@ -323,9 +306,7 @@ def get_ai_monitoring(
         .filter(AIFeedback.created_at >= today_start)
         .all()
     )
-    tokens_today = sum(
-        (r[0] or {}).get("total_tokens", 0) for r in rows_today
-    )
+    tokens_today = sum((r[0] or {}).get("total_tokens", 0) for r in rows_today)
 
     result = AIMonitoringResponse(
         total_requests=admin_repository.count_ai_requests(db),
@@ -347,7 +328,6 @@ def get_ai_monitoring(
 
 # Local import alias to avoid circular
 from app.schemas.admin import ProviderStat as _ProviderStat  # noqa: E402
-
 
 # ---------------------------------------------------------------------------
 # Audit Logs
@@ -447,7 +427,6 @@ def get_system_health(
     admin: User = Depends(get_admin_user),
 ):
     """Return live system health metrics (CPU, memory, disk, DB, AI provider)."""
-    import shutil
 
     # --- Database probe ---
     try:

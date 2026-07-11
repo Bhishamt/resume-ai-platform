@@ -49,6 +49,7 @@ async def ping_redis() -> bool:
 
 # ─── Generic Cache Helpers ────────────────────────────────────────────────────
 
+
 async def cache_get(key: str) -> Optional[Any]:
     """Retrieve a cached value (JSON-decoded). Returns None on miss or error."""
     try:
@@ -130,6 +131,7 @@ async def is_token_blacklisted(jti: str) -> bool:
 
 
 # ─── Redis Rate Limit Helpers ─────────────────────────────────────────────────
+
 
 async def rate_limit_check(key: str, limit: int, window: int) -> tuple[bool, int]:
     """Sliding window rate limiter using Redis.

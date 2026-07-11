@@ -33,20 +33,16 @@ celery_app.conf.update(
     result_serializer="json",
     timezone="UTC",
     enable_utc=True,
-
     # Results
-    result_expires=3600,        # 1 hour
+    result_expires=3600,  # 1 hour
     task_ignore_result=False,
-
     # Worker behaviour
-    worker_prefetch_multiplier=1,   # Fair dispatch for long tasks
-    task_acks_late=True,            # Ack after task completes (safer)
+    worker_prefetch_multiplier=1,  # Fair dispatch for long tasks
+    task_acks_late=True,  # Ack after task completes (safer)
     task_reject_on_worker_lost=True,
-
     # Retry defaults
     task_max_retries=3,
-    task_default_retry_delay=60,    # 60 seconds between retries
-
+    task_default_retry_delay=60,  # 60 seconds between retries
     # Queue routing
     task_routes={
         "app.tasks.resume_tasks.*": {"queue": "default"},
@@ -54,11 +50,9 @@ celery_app.conf.update(
         "app.tasks.notification_tasks.*": {"queue": "email"},
         "app.tasks.cleanup_tasks.*": {"queue": "cleanup"},
     },
-
     # Task always eager in testing (run synchronously)
     task_always_eager=settings.CELERY_TASK_ALWAYS_EAGER,
     task_eager_propagates=True,
-
     # Beat periodic schedule
     beat_schedule={
         "cleanup-expired-tokens-hourly": {

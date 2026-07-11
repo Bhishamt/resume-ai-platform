@@ -10,9 +10,9 @@ Tests cover:
 - Refresh token flow
 """
 
-from app.core.security import hash_password, validate_password_strength, verify_password
+from app.core.security import (hash_password, validate_password_strength,
+                               verify_password)
 from app.utils.jwt_utils import create_access_token, decode_token
-
 
 # ---------- Password Hashing ----------
 
@@ -97,6 +97,7 @@ class TestJWT:
 
     def test_expired_token_raises(self):
         from datetime import timedelta
+
         import jwt as pyjwt
 
         token = create_access_token(

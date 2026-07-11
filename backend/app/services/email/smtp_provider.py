@@ -38,14 +38,16 @@ class SMTPProvider(BaseEmailProvider):
                 port=settings.SMTP_PORT,
                 username=settings.SMTP_USER or None,
                 password=settings.SMTP_PASSWORD or None,
-                use_tls=False,          # STARTTLS is negotiated below
+                use_tls=False,  # STARTTLS is negotiated below
                 start_tls=settings.SMTP_USE_TLS,
                 timeout=30,
             )
             logger.info("SMTP email sent: to=%s subject=%s", to_email, subject)
             return True
         except aiosmtplib.SMTPException as exc:
-            logger.error("SMTP send failed: to=%s subject=%s error=%s", to_email, subject, exc)
+            logger.error(
+                "SMTP send failed: to=%s subject=%s error=%s", to_email, subject, exc
+            )
             return False
         except Exception as exc:
             logger.error("Unexpected SMTP error: to=%s error=%s", to_email, exc)
@@ -63,7 +65,7 @@ class ConsoleProvider(BaseEmailProvider):
         """Print email details to stdout for development inspection."""
         separator = "─" * 70
         print(f"\n{separator}")
-        print(f"📧 [CONSOLE EMAIL PROVIDER]")
+        print("📧 [CONSOLE EMAIL PROVIDER]")
         print(f"  To:      {to_email}")
         print(f"  Subject: {subject}")
         print(f"  Body:    (HTML — {len(html_body)} chars)")

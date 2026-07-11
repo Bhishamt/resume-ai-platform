@@ -1,11 +1,13 @@
 """Tests for WebSocket endpoint — connection, auth, messaging."""
 
 import json
+from unittest.mock import MagicMock
+
 import pytest
-from unittest.mock import MagicMock, patch
 from fastapi.testclient import TestClient
 
 from app.core.config import settings
+
 settings.APP_ENV = "testing"
 
 from app.main import app  # noqa: E402
@@ -26,6 +28,7 @@ class TestWebSocketAuth:
     def test_ws_rejects_invalid_token(self):
         """WebSocket connection with invalid JWT is closed with 4001."""
         from starlette.websockets import WebSocketDisconnect
+
         with TestClient(app) as client:
             with pytest.raises(WebSocketDisconnect):
                 with client.websocket_connect(
@@ -36,6 +39,7 @@ class TestWebSocketAuth:
     def test_ws_accepts_valid_token(self):
         """WebSocket connects and receives handshake with valid JWT."""
         from app.utils.jwt_utils import create_access_token
+
         token = create_access_token(subject="test-user-id")
 
         with TestClient(app) as client:
@@ -62,6 +66,7 @@ class TestConnectionManager:
         # Patch accept to be a coroutine
         async def async_accept():
             pass
+
         mock_ws.accept = async_accept
 
         await manager.connect(mock_ws, "user-123")
@@ -114,6 +119,7 @@ class TestWebSocketPingPong:
     def test_ws_responds_to_ping(self):
         """Server responds to client ping with pong."""
         from app.utils.jwt_utils import create_access_token
+
         token = create_access_token(subject="ping-test-user")
 
         with TestClient(app) as client:

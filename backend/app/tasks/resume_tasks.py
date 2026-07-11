@@ -7,10 +7,7 @@ so uploads return immediately while processing continues asynchronously.
 import logging
 from uuid import UUID
 
-from celery import shared_task
-
 from app.core.celery_app import celery_app
-from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -103,8 +100,14 @@ def trigger_ats_analysis_async(self, resume_id: str, user_id: str) -> dict:
 
         try:
             report = ats_service.run_ats_analysis(db, resume, UUID(user_id))
-            logger.info("ATS analysis complete: resume_id=%s report_id=%s", resume_id, report.id)
-            return {"status": "complete", "resume_id": resume_id, "report_id": str(report.id)}
+            logger.info(
+                "ATS analysis complete: resume_id=%s report_id=%s", resume_id, report.id
+            )
+            return {
+                "status": "complete",
+                "resume_id": resume_id,
+                "report_id": str(report.id),
+            }
         except Exception as exc:
             logger.error("ATS analysis failed: %s — %s", resume_id, exc)
             raise self.retry(exc=exc)

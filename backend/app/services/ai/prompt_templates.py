@@ -1,12 +1,21 @@
 from typing import List
 
+
 class PromptTemplate:
-    def __init__(self, name: str, version: str, variables: List[str], template: str, expected_output: str):
+    def __init__(
+        self,
+        name: str,
+        version: str,
+        variables: List[str],
+        template: str,
+        expected_output: str,
+    ):
         self.name = name
         self.version = version
         self.variables = variables
         self.template = template
         self.expected_output = expected_output
+
 
 # 1. Resume Review Template
 RESUME_REVIEW_TEMPLATE = """
@@ -44,7 +53,7 @@ resume_review = PromptTemplate(
     version="1.0.0",
     variables=["resume_text", "strengths", "weaknesses"],
     template=RESUME_REVIEW_TEMPLATE,
-    expected_output='{"overall_review": "string", "resume_improvements": "list", "better_summary": "string", "better_skills": "list", "better_experience": "string", "better_projects": "list"}'
+    expected_output='{"overall_review": "string", "resume_improvements": "list", "better_summary": "string", "better_skills": "list", "better_experience": "string", "better_projects": "list"}',
 )
 
 # 2. Cover Letter Template
@@ -78,7 +87,7 @@ cover_letter = PromptTemplate(
     version="1.0.0",
     variables=["resume_text", "job_title", "company_name", "job_text"],
     template=COVER_LETTER_TEMPLATE,
-    expected_output='{"professional_cover_letter": "string", "company_specific_version": "string", "ats_friendly_version": "string"}'
+    expected_output='{"professional_cover_letter": "string", "company_specific_version": "string", "ats_friendly_version": "string"}',
 )
 
 # 3. Resume Rewrite Template
@@ -107,7 +116,7 @@ resume_rewrite = PromptTemplate(
     version="1.0.0",
     variables=["resume_text"],
     template=RESUME_REWRITE_TEMPLATE,
-    expected_output='{"stronger_bullet_points": "list", "better_action_verbs": "list", "better_project_descriptions": "list"}'
+    expected_output='{"stronger_bullet_points": "list", "better_action_verbs": "list", "better_project_descriptions": "list"}',
 )
 
 # 4. Interview Preparation Template
@@ -149,7 +158,7 @@ interview_prep = PromptTemplate(
     version="1.0.0",
     variables=["resume_text", "job_text"],
     template=INTERVIEW_PREP_TEMPLATE,
-    expected_output='{"technical_questions": "list", "hr_questions": "list", "behavioral_questions": "list", "resume_based_questions": "list"}'
+    expected_output='{"technical_questions": "list", "hr_questions": "list", "behavioral_questions": "list", "resume_based_questions": "list"}',
 )
 
 # 5. Career Guidance Template
@@ -180,7 +189,7 @@ career_guidance = PromptTemplate(
     version="1.0.0",
     variables=["resume_text"],
     template=CAREER_GUIDANCE_TEMPLATE,
-    expected_output='{"learning_roadmap": "list", "missing_technologies": "list", "certifications": "list", "career_suggestions": "list"}'
+    expected_output='{"learning_roadmap": "list", "missing_technologies": "list", "certifications": "list", "career_suggestions": "list"}',
 )
 
 # Template registry
@@ -189,5 +198,5 @@ templates = {
     "cover_letter": cover_letter,
     "resume_rewrite": resume_rewrite,
     "interview_prep": interview_prep,
-    "career_guidance": career_guidance
+    "career_guidance": career_guidance,
 }

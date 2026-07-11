@@ -23,6 +23,7 @@ class SendGridProvider(BaseEmailProvider):
         try:
             import sendgrid
             from sendgrid.helpers.mail import Mail
+
             self._sg = sendgrid.SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
             self._Mail = Mail
         except ImportError as exc:
@@ -54,12 +55,18 @@ class SendGridProvider(BaseEmailProvider):
             status_code = await loop.run_in_executor(None, _blocking_send)
 
             if status_code in (200, 202):
-                logger.info("SendGrid email sent: to=%s subject=%s status=%d", to_email, subject, status_code)
+                logger.info(
+                    "SendGrid email sent: to=%s subject=%s status=%d",
+                    to_email,
+                    subject,
+                    status_code,
+                )
                 return True
             else:
                 logger.error(
                     "SendGrid returned non-success status: to=%s status=%d",
-                    to_email, status_code,
+                    to_email,
+                    status_code,
                 )
                 return False
 

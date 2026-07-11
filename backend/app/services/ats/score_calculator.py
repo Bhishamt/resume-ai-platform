@@ -1,11 +1,14 @@
 import re
 from datetime import datetime
 
+
 class ScoreCalculator:
     @classmethod
-    def calculate_experience_score_explainable(cls, text: str, action_verbs: list) -> tuple[int, int, int, list]:
+    def calculate_experience_score_explainable(
+        cls, text: str, action_verbs: list
+    ) -> tuple[int, int, int, list]:
         """Evaluate experience metrics.
-        
+
         Returns:
             tuple[score_out_of_100, years_of_experience, weighted_score, reasons]
         """
@@ -14,9 +17,11 @@ class ScoreCalculator:
 
         # Heuristic 1: Years of Experience from Date Ranges
         current_year = datetime.now().year
-        year_range_pattern = r"\b(19\d{2}|20\d{2})\s*[\-–—to\s]+\s*(19\d{2}|20\d{2}|present|current)\b"
+        year_range_pattern = (
+            r"\b(19\d{2}|20\d{2})\s*[\-–—to\s]+\s*(19\d{2}|20\d{2}|present|current)\b"
+        )
         ranges = re.findall(year_range_pattern, text.lower())
-        
+
         years = 0
         for start, end in ranges:
             start_yr = int(start)
@@ -27,19 +32,30 @@ class ScoreCalculator:
                     end_yr = int(end)
                 except ValueError:
                     end_yr = current_year
-            
+
             diff = end_yr - start_yr
             if 0 < diff < 50:  # Sanity check
                 years += diff
 
         # If no ranges found, look for explicit statements: "5 years of experience"
         if years == 0:
-            exp_statement = re.search(r"\b(\d+)\+?\s*years?\s+of\s+experience\b", text.lower())
+            exp_statement = re.search(
+                r"\b(\d+)\+?\s*years?\s+of\s+experience\b", text.lower()
+            )
             if exp_statement:
                 years = int(exp_statement.group(1))
 
         # Heuristic 2: Number of Positions
-        title_keywords = ["developer", "engineer", "architect", "lead", "manager", "analyst", "consultant", "specialist"]
+        title_keywords = [
+            "developer",
+            "engineer",
+            "architect",
+            "lead",
+            "manager",
+            "analyst",
+            "consultant",
+            "specialist",
+        ]
         title_count = 0
         for title in title_keywords:
             title_count += len(re.findall(rf"\b{title}\b", text.lower()))
@@ -48,9 +64,21 @@ class ScoreCalculator:
         verb_count = len(action_verbs)
 
         # Heuristic 4: Achievement Statements
-        metrics_pattern = r"\b(?:\d+(?:\.\d+)?%\b|\$\d+|\b\d+\s*(?:percent|x|X|million|billion)\b)"
+        metrics_pattern = (
+            r"\b(?:\d+(?:\.\d+)?%\b|\$\d+|\b\d+\s*(?:percent|x|X|million|billion)\b)"
+        )
         metrics_found = re.findall(metrics_pattern, text)
-        achievement_words = ["reduced", "increased", "improved", "optimized", "saved", "revenue", "saved", "launched", "delivered"]
+        achievement_words = [
+            "reduced",
+            "increased",
+            "improved",
+            "optimized",
+            "saved",
+            "revenue",
+            "saved",
+            "launched",
+            "delivered",
+        ]
         ach_word_count = sum(1 for w in achievement_words if w in text.lower())
         achievement_count = len(metrics_found) + (ach_word_count // 2)
 
@@ -100,7 +128,9 @@ class ScoreCalculator:
         if achievement_count >= 4:
             pass
         elif 2 <= achievement_count < 4:
-            reasons.append({"rule": "Fewer than 4 quantifiable achievements", "points": -1})
+            reasons.append(
+                {"rule": "Fewer than 4 quantifiable achievements", "points": -1}
+            )
             weighted_score -= 1
         elif achievement_count == 1:
             reasons.append({"rule": "Only 1 quantifiable achievement", "points": -2})
@@ -115,15 +145,21 @@ class ScoreCalculator:
         return score_out_of_100, years, weighted_score, reasons
 
     @classmethod
-    def calculate_experience_score(cls, text: str, action_verbs: list) -> tuple[int, int]:
+    def calculate_experience_score(
+        cls, text: str, action_verbs: list
+    ) -> tuple[int, int]:
         """Evaluate experience metrics (backward compatibility)."""
-        score, years, _, _ = cls.calculate_experience_score_explainable(text, action_verbs)
+        score, years, _, _ = cls.calculate_experience_score_explainable(
+            text, action_verbs
+        )
         return score, years
 
     @classmethod
-    def calculate_projects_score_explainable(cls, text: str, tech_skills: list) -> tuple[int, int, list]:
+    def calculate_projects_score_explainable(
+        cls, text: str, tech_skills: list
+    ) -> tuple[int, int, list]:
         """Evaluate projects metrics.
-        
+
         Returns:
             tuple[score_out_of_100, weighted_score, reasons]
         """
@@ -132,7 +168,7 @@ class ScoreCalculator:
 
         text_lower = text.lower()
         project_mentions = len(re.findall(r"\bproject\b", text_lower))
-        
+
         reasons = []
         weighted_score = 10
 
@@ -160,7 +196,9 @@ class ScoreCalculator:
             reasons.append({"rule": "Fewer than 3 tech skills mentioned", "points": -2})
             weighted_score -= 2
         else:
-            reasons.append({"rule": "No tech skills mentioned in projects", "points": -3})
+            reasons.append(
+                {"rule": "No tech skills mentioned in projects", "points": -3}
+            )
             weighted_score -= 3
 
         # Description detail / word length deduction (Max 3 points)
@@ -168,13 +206,28 @@ class ScoreCalculator:
         if words_count > 400 and project_mentions >= 1:
             pass
         elif words_count > 200:
-            reasons.append({"rule": "Resume text is under 400 words, project details may be brief", "points": -1})
+            reasons.append(
+                {
+                    "rule": "Resume text is under 400 words, project details may be brief",
+                    "points": -1,
+                }
+            )
             weighted_score -= 1
         elif words_count > 100:
-            reasons.append({"rule": "Resume text is under 200 words, lacking project details", "points": -2})
+            reasons.append(
+                {
+                    "rule": "Resume text is under 200 words, lacking project details",
+                    "points": -2,
+                }
+            )
             weighted_score -= 2
         else:
-            reasons.append({"rule": "Resume text is under 100 words, no space for project details", "points": -3})
+            reasons.append(
+                {
+                    "rule": "Resume text is under 100 words, no space for project details",
+                    "points": -3,
+                }
+            )
             weighted_score -= 3
 
         weighted_score = max(0, min(10, weighted_score))
@@ -191,7 +244,7 @@ class ScoreCalculator:
     @classmethod
     def calculate_education_score_explainable(cls, text: str) -> tuple[int, int, list]:
         """Evaluate education credentials.
-        
+
         Returns:
             tuple[score_out_of_100, weighted_score, reasons]
         """
@@ -203,17 +256,50 @@ class ScoreCalculator:
         weighted_score = 10
 
         # Heuristic 1: Degree (Max 4 points deduction)
-        degree_keywords = ["bachelor", "master", "phd", "b.sc", "b.s", "m.sc", "m.s", "b.tech", "m.tech", "degree", "diploma", "graduate", "bs", "ms", "mba"]
+        degree_keywords = [
+            "bachelor",
+            "master",
+            "phd",
+            "b.sc",
+            "b.s",
+            "m.sc",
+            "m.s",
+            "b.tech",
+            "m.tech",
+            "degree",
+            "diploma",
+            "graduate",
+            "bs",
+            "ms",
+            "mba",
+        ]
         has_degree = any(re.search(rf"\b{d}\b", text_lower) for d in degree_keywords)
         if not has_degree:
-            reasons.append({"rule": "No degree keyword (Bachelor, Master, PhD, etc.) detected", "points": -4})
+            reasons.append(
+                {
+                    "rule": "No degree keyword (Bachelor, Master, PhD, etc.) detected",
+                    "points": -4,
+                }
+            )
             weighted_score -= 4
 
         # Heuristic 2: Institution (Max 4 points deduction)
-        inst_keywords = ["university", "college", "institute", "academy", "school", "polytechnic"]
+        inst_keywords = [
+            "university",
+            "college",
+            "institute",
+            "academy",
+            "school",
+            "polytechnic",
+        ]
         has_inst = any(inst in text_lower for inst in inst_keywords)
         if not has_inst:
-            reasons.append({"rule": "No institution keyword (University, College, etc.) detected", "points": -4})
+            reasons.append(
+                {
+                    "rule": "No institution keyword (University, College, etc.) detected",
+                    "points": -4,
+                }
+            )
             weighted_score -= 4
 
         # Heuristic 3: Graduation Year (Max 2 points deduction)
@@ -236,7 +322,7 @@ class ScoreCalculator:
     @classmethod
     def calculate_grammar_score_explainable(cls, text: str) -> tuple[int, int, list]:
         """Evaluate grammar, readability, and punctuation quality.
-        
+
         Returns:
             tuple[score_out_of_100, weighted_score, reasons]
         """
@@ -268,25 +354,44 @@ class ScoreCalculator:
         if 10 <= avg_sentence_len <= 25:
             pass
         elif 5 <= avg_sentence_len < 10 or 25 < avg_sentence_len <= 35:
-            reasons.append({"rule": "Average sentence length is slightly outside the optimal 10-25 range", "points": -0.5})
+            reasons.append(
+                {
+                    "rule": "Average sentence length is slightly outside the optimal 10-25 range",
+                    "points": -0.5,
+                }
+            )
             weighted_score -= 0.5
         else:
-            reasons.append({"rule": "Average sentence length is either too short or excessively long", "points": -1.5})
+            reasons.append(
+                {
+                    "rule": "Average sentence length is either too short or excessively long",
+                    "points": -1.5,
+                }
+            )
             weighted_score -= 1.5
 
         # Double spaces (Max 1 point)
         if double_spaces > 0:
-            reasons.append({"rule": "Found multiple double spaces in text", "points": -0.5})
+            reasons.append(
+                {"rule": "Found multiple double spaces in text", "points": -0.5}
+            )
             weighted_score -= 0.5
 
         # Missing space punctuation (Max 1 point)
         if missing_space_punctuation > 0:
-            reasons.append({"rule": "Found missing spaces after punctuation marks", "points": -0.5})
+            reasons.append(
+                {"rule": "Found missing spaces after punctuation marks", "points": -0.5}
+            )
             weighted_score -= 0.5
 
         # Capitalization errors (Max 1 point)
         if capitalization_errors > 0:
-            reasons.append({"rule": "Found sentences starting with a lowercase letter", "points": -0.5})
+            reasons.append(
+                {
+                    "rule": "Found sentences starting with a lowercase letter",
+                    "points": -0.5,
+                }
+            )
             weighted_score -= 0.5
 
         weighted_score = max(0.0, min(5.0, weighted_score))
@@ -299,15 +404,12 @@ class ScoreCalculator:
         """Evaluate grammar, readability, and punctuation quality (backward compatibility)."""
         score_out_of_100, _, reasons = cls.calculate_grammar_score_explainable(text)
         feedback = [r["rule"] for r in reasons]
-        return {
-            "score": score_out_of_100,
-            "feedback": feedback
-        }
+        return {"score": score_out_of_100, "feedback": feedback}
 
     @classmethod
     def calculate_final_score(cls, category_scores: dict) -> int:
         """Calculate weighted final ATS score.
-        
+
         Weights:
             Keywords: 30%
             Experience: 20%
@@ -318,12 +420,12 @@ class ScoreCalculator:
             Sections: 10%
         """
         weighted_score = (
-            (category_scores.get("keyword_score", 0) * 0.30) +
-            (category_scores.get("experience_score", 0) * 0.20) +
-            (category_scores.get("formatting_score", 0) * 0.15) +
-            (category_scores.get("projects_score", 0) * 0.10) +
-            (category_scores.get("education_score", 0) * 0.10) +
-            (category_scores.get("grammar_score", 0) * 0.05) +
-            (category_scores.get("section_score", 0) * 0.10)
+            (category_scores.get("keyword_score", 0) * 0.30)
+            + (category_scores.get("experience_score", 0) * 0.20)
+            + (category_scores.get("formatting_score", 0) * 0.15)
+            + (category_scores.get("projects_score", 0) * 0.10)
+            + (category_scores.get("education_score", 0) * 0.10)
+            + (category_scores.get("grammar_score", 0) * 0.05)
+            + (category_scores.get("section_score", 0) * 0.10)
         )
         return int(round(weighted_score))

@@ -1,5 +1,7 @@
 import docx
+
 from app.services.parser.base_parser import BaseParser, ParsedResumeData
+
 
 class DOCXParser(BaseParser):
     """Resume parser implementation for DOCX documents."""
@@ -10,7 +12,7 @@ class DOCXParser(BaseParser):
         try:
             doc = docx.Document(file_path)
             paragraphs_text = [p.text for p in doc.paragraphs if p.text]
-            
+
             # Also extract text from tables
             tables_text = []
             for table in doc.tables:
@@ -18,9 +20,9 @@ class DOCXParser(BaseParser):
                     for cell in row.cells:
                         if cell.text.strip():
                             tables_text.append(cell.text)
-            
+
             raw_text = "\n".join(paragraphs_text + tables_text)
-        except Exception as e:
+        except Exception:
             raw_text = ""
 
         # Extract contact details and sections using base helper

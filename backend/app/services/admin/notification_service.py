@@ -8,12 +8,8 @@ from sqlalchemy.orm import Session
 
 from app.core.exceptions import NotFoundError
 from app.repositories import admin_repository
-from app.schemas.admin import (
-    NotificationCreate,
-    NotificationListResponse,
-    NotificationResponse,
-    PaginatedMeta,
-)
+from app.schemas.admin import (NotificationCreate, NotificationListResponse,
+                               NotificationResponse, PaginatedMeta)
 
 logger = logging.getLogger(__name__)
 
@@ -36,9 +32,7 @@ def list_notifications(
         limit=per_page,
     )
     pages = (total + per_page - 1) // per_page
-    unread_count = (
-        admin_repository.get_unread_count(db, user_id) if user_id else 0
-    )
+    unread_count = admin_repository.get_unread_count(db, user_id) if user_id else 0
     return NotificationListResponse(
         notifications=[NotificationResponse.model_validate(n) for n in notifications],
         unread_count=unread_count,
@@ -63,7 +57,9 @@ def create_notification(
     return NotificationResponse.model_validate(notif)
 
 
-def mark_read(db: Session, *, notification_id: UUID, user_id: UUID) -> NotificationResponse:
+def mark_read(
+    db: Session, *, notification_id: UUID, user_id: UUID
+) -> NotificationResponse:
     """Mark a single notification as read."""
     notifications, _ = admin_repository.get_notifications(
         db, user_id=user_id, skip=0, limit=1000
@@ -93,7 +89,7 @@ def broadcast_notification(
     """Send a notification to ALL active users. Returns count created."""
     from app.models.user import User
 
-    users = db.query(User).filter(User.is_active == True).all()
+    users = db.query(User).filter(User.is_active).all()
     count = 0
     for user in users:
         admin_repository.create_notification(

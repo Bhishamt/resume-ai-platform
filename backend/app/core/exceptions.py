@@ -41,7 +41,9 @@ class AuthenticationError(AppException):
 class AuthorizationError(AppException):
     """Raised when user lacks permissions."""
 
-    def __init__(self, message: str = "You do not have permission to perform this action."):
+    def __init__(
+        self, message: str = "You do not have permission to perform this action."
+    ):
         super().__init__(
             message=message,
             status_code=status.HTTP_403_FORBIDDEN,
@@ -71,7 +73,9 @@ class NotFoundError(AppException):
 class BadRequestError(AppException):
     """Raised for invalid request data."""
 
-    def __init__(self, message: str = "Invalid request.", errors: list[str] | None = None):
+    def __init__(
+        self, message: str = "Invalid request.", errors: list[str] | None = None
+    ):
         super().__init__(
             message=message,
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -89,7 +93,9 @@ class RateLimitError(AppException):
         )
 
 
-def _error_response(status_code: int, message: str, errors: list[Any] | None = None) -> JSONResponse:
+def _error_response(
+    status_code: int, message: str, errors: list[Any] | None = None
+) -> JSONResponse:
     """Build a consistent error response."""
     return JSONResponse(
         status_code=status_code,
@@ -105,12 +111,16 @@ def register_exception_handlers(app: FastAPI) -> None:
     """Register all custom exception handlers on the FastAPI app."""
 
     @app.exception_handler(AppException)
-    async def app_exception_handler(_request: Request, exc: AppException) -> JSONResponse:
+    async def app_exception_handler(
+        _request: Request, exc: AppException
+    ) -> JSONResponse:
         logger.warning("AppException: %s (status=%d)", exc.message, exc.status_code)
         return _error_response(exc.status_code, exc.message, exc.errors)
 
     @app.exception_handler(RequestValidationError)
-    async def validation_exception_handler(_request: Request, exc: RequestValidationError) -> JSONResponse:
+    async def validation_exception_handler(
+        _request: Request, exc: RequestValidationError
+    ) -> JSONResponse:
         error_messages = []
         for error in exc.errors():
             field = " -> ".join(str(loc) for loc in error.get("loc", []))
@@ -124,7 +134,9 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(Exception)
-    async def generic_exception_handler(_request: Request, exc: Exception) -> JSONResponse:
+    async def generic_exception_handler(
+        _request: Request, exc: Exception
+    ) -> JSONResponse:
         logger.exception("Unhandled exception: %s", str(exc))
         return _error_response(
             status.HTTP_500_INTERNAL_SERVER_ERROR,

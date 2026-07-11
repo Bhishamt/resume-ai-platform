@@ -118,7 +118,9 @@ def send_analysis_complete_task(
     """Notify user that their resume analysis is ready."""
     from app.services.email.email_service import get_email_service
 
-    logger.info("send_analysis_complete_task: to=%s resume_id=%s", user_email, resume_id)
+    logger.info(
+        "send_analysis_complete_task: to=%s resume_id=%s", user_email, resume_id
+    )
     try:
         service = get_email_service()
         _run_async(

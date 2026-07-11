@@ -40,6 +40,7 @@ register_exception_handlers(app)
 if settings.ENABLE_METRICS:
     try:
         from prometheus_fastapi_instrumentator import Instrumentator
+
         Instrumentator(
             should_group_status_codes=True,
             should_ignore_untemplated=True,
@@ -48,7 +49,9 @@ if settings.ENABLE_METRICS:
         ).instrument(app).expose(app, endpoint=f"{settings.API_V1_STR}/metrics")
         logger.info("Prometheus metrics enabled at %s/metrics", settings.API_V1_STR)
     except ImportError:
-        logger.warning("prometheus-fastapi-instrumentator not installed — metrics disabled")
+        logger.warning(
+            "prometheus-fastapi-instrumentator not installed — metrics disabled"
+        )
 
 # ── Middleware (added in reverse order — last added = outermost) ───────────────
 
@@ -76,6 +79,7 @@ if settings.CORS_ORIGINS:
 
 
 # ── Security Headers ──────────────────────────────────────────────────────────
+
 
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next) -> Response:
@@ -115,12 +119,14 @@ async def add_security_headers(request: Request, call_next) -> Response:
 
 # ── Request Size Limit ────────────────────────────────────────────────────────
 
+
 @app.middleware("http")
 async def enforce_request_size(request: Request, call_next) -> Response:
     """Reject requests with body exceeding MAX_REQUEST_SIZE."""
     content_length = request.headers.get("content-length")
     if content_length and int(content_length) > settings.MAX_REQUEST_SIZE:
         from fastapi.responses import JSONResponse
+
         return JSONResponse(
             status_code=413,
             content={
@@ -133,6 +139,7 @@ async def enforce_request_size(request: Request, call_next) -> Response:
 
 
 # ── Startup / Shutdown Events ─────────────────────────────────────────────────
+
 
 @app.on_event("startup")
 async def on_startup() -> None:
@@ -151,7 +158,10 @@ async def on_startup() -> None:
             "placeholder_secret_key_change_in_production",
             "placeholder_jwt_secret_change_in_production",
         ]
-        if settings.SECRET_KEY in dangerous_defaults or settings.JWT_SECRET in dangerous_defaults:
+        if (
+            settings.SECRET_KEY in dangerous_defaults
+            or settings.JWT_SECRET in dangerous_defaults
+        ):
             raise RuntimeError(
                 "FATAL: Placeholder secrets detected in production. "
                 "Set SECRET_KEY and JWT_SECRET in environment."
@@ -160,6 +170,7 @@ async def on_startup() -> None:
     # Warm Redis connection
     try:
         from app.core.redis_client import ping_redis
+
         redis_ok = await ping_redis()
         if redis_ok:
             logger.info("Redis connected successfully")
@@ -175,6 +186,7 @@ async def on_shutdown() -> None:
     logger.info("Shutting down %s", settings.PROJECT_NAME)
     try:
         from app.core.redis_client import _redis_client
+
         if _redis_client:
             await _redis_client.aclose()
             logger.info("Redis connection closed")

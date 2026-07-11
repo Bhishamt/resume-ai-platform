@@ -1,6 +1,8 @@
 import re
-from typing import List, Dict
+from typing import Dict
+
 from app.services.ats.keyword_analyzer import KeywordAnalyzer
+
 
 class KeywordMatcher:
     @classmethod
@@ -8,7 +10,7 @@ class KeywordMatcher:
         word_lower = word.lower().strip()
         if not word_lower:
             return False
-        
+
         escaped_word = re.escape(word_lower)
         if word_lower.endswith("++") or word_lower.endswith("#"):
             pattern = rf"\b{escaped_word}"
@@ -16,13 +18,15 @@ class KeywordMatcher:
             pattern = rf"{escaped_word}\b"
         else:
             pattern = rf"\b{escaped_word}\b"
-            
+
         return re.search(pattern, text_lower) is not None
 
     @classmethod
-    def match_keywords(cls, resume_text: str, job_title: str, job_description: str) -> Dict:
+    def match_keywords(
+        cls, resume_text: str, job_title: str, job_description: str
+    ) -> Dict:
         """Find overlap of predefined keywords between job description and resume.
-        
+
         Returns:
             Dict containing scores, list of matching/missing keywords, and explanations.
         """
@@ -32,7 +36,9 @@ class KeywordMatcher:
                 "weighted_score": 0.0,
                 "matching_keywords": [],
                 "missing_keywords": [],
-                "reasons": [{"rule": "Resume or job description is empty", "points": -20.0}]
+                "reasons": [
+                    {"rule": "Resume or job description is empty", "points": -20.0}
+                ],
             }
 
         resume_lower = resume_text.lower()
@@ -54,13 +60,14 @@ class KeywordMatcher:
                     elif term == "fastapi":
                         display_term = "FastAPI"
                     job_keywords.append(display_term)
-        
+
         job_keywords = sorted(list(set(job_keywords)))
 
         # Fallback to critical keywords if none are found in the job description description
         if not job_keywords:
             job_keywords = [
-                kw.title() if len(kw) > 3 else kw.upper() for kw in KeywordAnalyzer.CRITICAL_KEYWORDS
+                kw.title() if len(kw) > 3 else kw.upper()
+                for kw in KeywordAnalyzer.CRITICAL_KEYWORDS
             ]
 
         # 2. Check which job keywords are present in the resume
@@ -75,8 +82,10 @@ class KeywordMatcher:
         # 3. Calculate Scores (Max 20 points)
         total_count = len(job_keywords)
         matched_count = len(matching_keywords)
-        
-        category_score = (matched_count / total_count) * 100.0 if total_count > 0 else 100.0
+
+        category_score = (
+            (matched_count / total_count) * 100.0 if total_count > 0 else 100.0
+        )
         weighted_score = (category_score / 100.0) * 20.0
 
         # 4. Generate Explanations
@@ -86,12 +95,14 @@ class KeywordMatcher:
         for kw in matching_keywords:
             reasons.append({"rule": f"{kw} keyword matched", "points": 0.0})
         for kw in missing_keywords:
-            reasons.append({"rule": f"Missing {kw} keyword", "points": -round(pts_per_keyword, 2)})
+            reasons.append(
+                {"rule": f"Missing {kw} keyword", "points": -round(pts_per_keyword, 2)}
+            )
 
         return {
             "score": int(round(category_score)),
             "weighted_score": round(weighted_score, 2),
             "matching_keywords": matching_keywords,
             "missing_keywords": missing_keywords,
-            "reasons": reasons
+            "reasons": reasons,
         }

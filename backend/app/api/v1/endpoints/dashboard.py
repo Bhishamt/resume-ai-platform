@@ -3,15 +3,17 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_current_active_user, get_db
 from app.models.user import User
+from app.schemas.dashboard import (DashboardPreferencesResponse,
+                                   DashboardPreferencesUpdate)
 from app.schemas.user import APIResponse
-from app.schemas.dashboard import DashboardPreferencesUpdate, DashboardPreferencesResponse
+from app.services.dashboard.analytics_service import AnalyticsService
 from app.services.dashboard.dashboard_service import DashboardService
+from app.services.dashboard.recommendation_service import RecommendationService
 from app.services.dashboard.statistics_service import StatisticsService
 from app.services.dashboard.trend_service import TrendService
-from app.services.dashboard.analytics_service import AnalyticsService
-from app.services.dashboard.recommendation_service import RecommendationService
 
 router = APIRouter()
+
 
 @router.get(
     "",
@@ -27,13 +29,14 @@ def get_consolidated_dashboard(
         return APIResponse(
             success=True,
             message="Dashboard consolidated data retrieved successfully.",
-            data=data
+            data=data,
         )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An error occurred while compiling dashboard: {str(e)}"
+            detail=f"An error occurred while compiling dashboard: {str(e)}",
         )
+
 
 @router.get(
     "/stats",
@@ -49,13 +52,14 @@ def get_dashboard_stats(
         return APIResponse(
             success=True,
             message="Dashboard statistics retrieved successfully.",
-            data=data
+            data=data,
         )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to calculate stats: {str(e)}"
+            detail=f"Failed to calculate stats: {str(e)}",
         )
+
 
 @router.get(
     "/trends",
@@ -69,15 +73,14 @@ def get_dashboard_trends(
     try:
         data = TrendService.get_user_trends(db, current_user.id)
         return APIResponse(
-            success=True,
-            message="Dashboard trends retrieved successfully.",
-            data=data
+            success=True, message="Dashboard trends retrieved successfully.", data=data
         )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to calculate trends: {str(e)}"
+            detail=f"Failed to calculate trends: {str(e)}",
         )
+
 
 @router.get(
     "/skills",
@@ -93,13 +96,14 @@ def get_dashboard_skills(
         return APIResponse(
             success=True,
             message="Dashboard skills analytics retrieved successfully.",
-            data=data
+            data=data,
         )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to calculate skills analytics: {str(e)}"
+            detail=f"Failed to calculate skills analytics: {str(e)}",
         )
+
 
 @router.get(
     "/recommendations",
@@ -115,13 +119,14 @@ def get_dashboard_recommendations(
         return APIResponse(
             success=True,
             message="Dashboard recommendations retrieved successfully.",
-            data=data
+            data=data,
         )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to compile career recommendations: {str(e)}"
+            detail=f"Failed to compile career recommendations: {str(e)}",
         )
+
 
 @router.put(
     "/preferences",
@@ -139,16 +144,16 @@ def update_dashboard_preferences(
             user_id=current_user.id,
             layout=payload.layout,
             widgets=payload.widgets,
-            theme=payload.theme
+            theme=payload.theme,
         )
         prefs_response = DashboardPreferencesResponse.model_validate(prefs)
         return APIResponse(
             success=True,
             message="Dashboard preferences updated successfully.",
-            data=prefs_response.model_dump(mode="json")
+            data=prefs_response.model_dump(mode="json"),
         )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to save preferences: {str(e)}"
+            detail=f"Failed to save preferences: {str(e)}",
         )

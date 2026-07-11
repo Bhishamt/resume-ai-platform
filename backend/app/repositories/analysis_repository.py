@@ -1,12 +1,16 @@
 from typing import Optional
 from uuid import UUID
+
 from sqlalchemy.orm import Session
+
 from app.models.analysis_report import AnalysisReport
 from app.models.resume import Resume
+
 
 def get_by_id(db: Session, report_id: UUID) -> Optional[AnalysisReport]:
     """Fetch an analysis report by its UUID."""
     return db.query(AnalysisReport).filter(AnalysisReport.id == report_id).first()
+
 
 def get_all_by_user_id(db: Session, user_id: UUID) -> list[AnalysisReport]:
     """Fetch all analysis reports belonging to the user's resumes."""
@@ -17,6 +21,7 @@ def get_all_by_user_id(db: Session, user_id: UUID) -> list[AnalysisReport]:
         .order_by(AnalysisReport.created_at.desc())
         .all()
     )
+
 
 def create(db: Session, resume_id: UUID, report_data: dict) -> AnalysisReport:
     """Create a new analysis report record."""
@@ -40,6 +45,7 @@ def create(db: Session, resume_id: UUID, report_data: dict) -> AnalysisReport:
     db.commit()
     db.refresh(report)
     return report
+
 
 def delete(db: Session, report: AnalysisReport) -> None:
     """Delete an analysis report record."""

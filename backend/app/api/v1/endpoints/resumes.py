@@ -4,16 +4,19 @@ All routes are protected by JWT authentication and verify user ownership.
 """
 
 from uuid import UUID
-from fastapi import APIRouter, Depends, UploadFile, File, Form, status, Query
+
+from fastapi import APIRouter, Depends, File, Form, Query, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_current_active_user, get_db
 from app.models.user import User
+from app.schemas.resume import (PaginatedResumes, ResumeResponse, ResumeUpdate,
+                                UploadHistoryResponse)
 from app.schemas.user import APIResponse
-from app.schemas.resume import ResumeResponse, PaginatedResumes, UploadHistoryResponse, ResumeUpdate
 from app.services import resume_service
 
 router = APIRouter()
+
 
 @router.post(
     "/upload",
@@ -22,7 +25,9 @@ router = APIRouter()
     summary="Upload and parse a new resume",
 )
 def upload_resume(
-    file: UploadFile = File(..., description="Resume file (PDF or DOCX only, max 10MB)"),
+    file: UploadFile = File(
+        ..., description="Resume file (PDF or DOCX only, max 10MB)"
+    ),
     title: str | None = Form(None, description="Optional custom title for the resume"),
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db),
@@ -34,6 +39,7 @@ def upload_resume(
         message="Resume uploaded and parsed successfully.",
         data=ResumeResponse.model_validate(resume).model_dump(mode="json"),
     )
+
 
 @router.get(
     "",
@@ -47,7 +53,9 @@ def get_resumes(
     db: Session = Depends(get_db),
 ):
     """Retrieve all resumes owned by the authenticated user with offset pagination."""
-    items, total = resume_service.get_resumes_paginated(db, current_user.id, page, limit)
+    items, total = resume_service.get_resumes_paginated(
+        db, current_user.id, page, limit
+    )
     paginated_data = PaginatedResumes(
         items=[ResumeResponse.model_validate(i) for i in items],
         total=total,
@@ -59,6 +67,7 @@ def get_resumes(
         message="Resumes retrieved successfully.",
         data=paginated_data.model_dump(mode="json"),
     )
+
 
 @router.get(
     "/history",
@@ -72,7 +81,7 @@ def get_upload_history(
     """Retrieve all resume-related actions (upload, replace, delete) done by the user."""
     history = resume_service.get_upload_history(db, current_user.id)
     history_responses = []
-    
+
     # Enrich history with titles if needed or output directly
     for entry in history:
         resp = UploadHistoryResponse.model_validate(entry)
@@ -87,6 +96,7 @@ def get_upload_history(
         message="Upload history retrieved successfully.",
         data=[h.model_dump(mode="json") for h in history_responses],
     )
+
 
 @router.get(
     "/{id}",
@@ -106,6 +116,7 @@ def get_resume(
         data=ResumeResponse.model_validate(resume).model_dump(mode="json"),
     )
 
+
 @router.delete(
     "/{id}",
     response_model=APIResponse,
@@ -122,6 +133,7 @@ def delete_resume(
         success=True,
         message="Resume deleted successfully.",
     )
+
 
 @router.put(
     "/{id}",
@@ -142,6 +154,7 @@ def update_resume(
         data=ResumeResponse.model_validate(resume).model_dump(mode="json"),
     )
 
+
 @router.post(
     "/{id}/replace",
     response_model=APIResponse,
@@ -149,7 +162,9 @@ def update_resume(
 )
 def replace_resume(
     id: UUID,
-    file: UploadFile = File(..., description="New resume file (PDF or DOCX only, max 10MB)"),
+    file: UploadFile = File(
+        ..., description="New resume file (PDF or DOCX only, max 10MB)"
+    ),
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db),
 ):

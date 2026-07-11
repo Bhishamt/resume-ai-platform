@@ -3,7 +3,9 @@
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
+
 from pydantic import BaseModel, Field
+
 
 class ResumeResponse(BaseModel):
     id: UUID
@@ -21,11 +23,13 @@ class ResumeResponse(BaseModel):
 
     model_config = {"from_attributes": True}
 
+
 class PaginatedResumes(BaseModel):
     items: list[ResumeResponse]
     total: int
     page: int
     limit: int
+
 
 class UploadHistoryResponse(BaseModel):
     id: UUID
@@ -37,5 +41,8 @@ class UploadHistoryResponse(BaseModel):
 
     model_config = {"from_attributes": True}
 
+
 class ResumeUpdate(BaseModel):
-    title: str = Field(..., min_length=1, max_length=255, description="Update resume title")
+    title: str = Field(
+        ..., min_length=1, max_length=255, description="Update resume title"
+    )

@@ -1,7 +1,8 @@
 """Tests for email service providers and template rendering."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 
 
 class TestSMTPProvider:
@@ -12,7 +13,9 @@ class TestSMTPProvider:
         """SMTPProvider.send returns True on successful delivery."""
         from app.services.email.smtp_provider import SMTPProvider
 
-        with patch("app.services.email.smtp_provider.aiosmtplib.send", new_callable=AsyncMock) as mock_send:
+        with patch(
+            "app.services.email.smtp_provider.aiosmtplib.send", new_callable=AsyncMock
+        ) as mock_send:
             mock_send.return_value = None  # aiosmtplib.send returns None on success
             provider = SMTPProvider()
             result = await provider.send(
@@ -27,6 +30,7 @@ class TestSMTPProvider:
     async def test_smtp_send_failure_returns_false(self):
         """SMTPProvider.send returns False on SMTP exception."""
         import aiosmtplib
+
         from app.services.email.smtp_provider import SMTPProvider
 
         with patch(
@@ -76,9 +80,12 @@ class TestSendGridProvider:
             mock_response.status_code = 202
             mock_sg_client.send.return_value = mock_response
 
-            with patch("sendgrid.SendGridAPIClient", return_value=mock_sg_client), \
-                 patch("app.services.email.sendgrid_provider.settings", mock_settings):
-                from app.services.email.sendgrid_provider import SendGridProvider
+            with patch(
+                "sendgrid.SendGridAPIClient", return_value=mock_sg_client
+            ), patch("app.services.email.sendgrid_provider.settings", mock_settings):
+                from app.services.email.sendgrid_provider import \
+                    SendGridProvider
+
                 provider = SendGridProvider()
                 provider._sg = mock_sg_client
 
@@ -105,10 +112,15 @@ class TestEmailService:
             mock_settings.FRONTEND_URL = "http://localhost:5173"
 
             from app.services.email.email_service import EmailService
+
             service = EmailService(mock_provider)
 
-            with patch("app.services.email.email_service.settings", mock_settings), \
-                 patch("app.services.email.email_service.render_template", return_value="<html>Welcome</html>"):
+            with patch(
+                "app.services.email.email_service.settings", mock_settings
+            ), patch(
+                "app.services.email.email_service.render_template",
+                return_value="<html>Welcome</html>",
+            ):
                 result = await service.send_welcome("user@example.com", "Alice")
 
         assert result is True
@@ -124,6 +136,7 @@ class TestEmailService:
             mock_settings.EMAIL_ENABLED = False
 
             from app.services.email.email_service import EmailService
+
             service = EmailService(mock_provider)
             result = await service.send_email("user@example.com", "Test", "<p>body</p>")
 
@@ -140,8 +153,10 @@ class TestEmailService:
         with patch("app.services.email.email_service.settings") as mock_settings:
             mock_settings.EMAIL_PROVIDER = "smtp"
 
-            with patch("app.services.email.smtp_provider.SMTPProvider") as MockSMTP:
-                from app.services.email.email_service import get_email_service, EmailService
+            with patch("app.services.email.smtp_provider.SMTPProvider"):
+                from app.services.email.email_service import (
+                    EmailService, get_email_service)
+
                 service = get_email_service()
                 assert isinstance(service, EmailService)
 
@@ -160,11 +175,14 @@ class TestTemplateRendering:
             mock_settings.FRONTEND_URL = "http://localhost:5173"
             mock_settings.PROJECT_NAME = "Test Platform"
 
-            html = render_template("welcome.html", {
-                "full_name": "John Doe",
-                "login_url": "http://localhost:5173/login",
-                "dashboard_url": "http://localhost:5173/dashboard",
-            })
+            html = render_template(
+                "welcome.html",
+                {
+                    "full_name": "John Doe",
+                    "login_url": "http://localhost:5173/login",
+                    "dashboard_url": "http://localhost:5173/dashboard",
+                },
+            )
 
         assert "John Doe" in html
         assert "Welcome" in html
@@ -177,11 +195,14 @@ class TestTemplateRendering:
             mock_settings.FRONTEND_URL = "http://localhost:5173"
             mock_settings.PROJECT_NAME = "Test Platform"
 
-            html = render_template("password_reset.html", {
-                "full_name": "Jane Smith",
-                "reset_url": "http://localhost:5173/reset?token=abc123",
-                "expire_minutes": 30,
-            })
+            html = render_template(
+                "password_reset.html",
+                {
+                    "full_name": "Jane Smith",
+                    "reset_url": "http://localhost:5173/reset?token=abc123",
+                    "expire_minutes": 30,
+                },
+            )
 
         assert "Jane Smith" in html
         assert "abc123" in html

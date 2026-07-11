@@ -5,7 +5,6 @@ These keep the system healthy without manual intervention.
 """
 
 import logging
-import os
 from pathlib import Path
 
 from app.core.celery_app import celery_app
@@ -28,6 +27,7 @@ def cleanup_expired_tokens() -> dict:
 
     async def _count_blacklisted():
         from app.core.redis_client import get_redis
+
         client = get_redis()
         keys = await client.keys("jwt:blacklist:*")
         return len(keys)
@@ -35,7 +35,10 @@ def cleanup_expired_tokens() -> dict:
     loop = asyncio.new_event_loop()
     try:
         count = loop.run_until_complete(_count_blacklisted())
-        logger.info("cleanup_expired_tokens: %d blacklisted tokens in Redis (TTL-managed)", count)
+        logger.info(
+            "cleanup_expired_tokens: %d blacklisted tokens in Redis (TTL-managed)",
+            count,
+        )
         return {"status": "ok", "blacklisted_tokens": count}
     finally:
         loop.close()
@@ -65,11 +68,7 @@ def cleanup_orphaned_files() -> dict:
 
     try:
         # Collect all storage paths known to the DB
-        known_paths = {
-            row[0]
-            for row in db.query(Resume.storage_path).all()
-            if row[0]
-        }
+        known_paths = {row[0] for row in db.query(Resume.storage_path).all() if row[0]}
 
         # Walk all files in the upload directory
         for user_dir in upload_dir.iterdir():
@@ -85,11 +84,11 @@ def cleanup_orphaned_files() -> dict:
                         deleted += 1
                         logger.info("Deleted orphaned file: %s", file_path)
                     except OSError as e:
-                        logger.warning("Could not delete orphaned file %s: %s", file_path, e)
+                        logger.warning(
+                            "Could not delete orphaned file %s: %s", file_path, e
+                        )
 
-        logger.info(
-            "cleanup_orphaned_files: scanned=%d deleted=%d", scanned, deleted
-        )
+        logger.info("cleanup_orphaned_files: scanned=%d deleted=%d", scanned, deleted)
         return {"status": "ok", "scanned": scanned, "deleted": deleted}
 
     finally:
@@ -110,6 +109,7 @@ def cleanup_old_cache() -> dict:
 
     async def _scan_cache():
         from app.core.redis_client import get_redis
+
         client = get_redis()
         cache_keys = await client.keys("cache:*")
         return len(cache_keys)
@@ -141,11 +141,7 @@ def trigger_weekly_summaries() -> dict:
     db = SessionLocal()
     dispatched = 0
     try:
-        active_users = (
-            db.query(User)
-            .filter(User.is_active == True)  # noqa: E712
-            .all()
-        )
+        active_users = db.query(User).filter(User.is_active == True).all()  # noqa: E712
 
         for user in active_users:
             # Build lightweight summary data — real implementation pulls

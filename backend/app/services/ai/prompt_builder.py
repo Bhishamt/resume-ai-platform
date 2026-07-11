@@ -1,5 +1,7 @@
-from typing import Dict, Any
+from typing import Any, Dict
+
 from app.services.ai.prompt_templates import PromptTemplate
+
 
 class PromptBuilder:
     @staticmethod
@@ -10,7 +12,9 @@ class PromptBuilder:
         """
         missing_vars = [var for var in template.variables if var not in variables]
         if missing_vars:
-            raise ValueError(f"Missing required variables for prompt '{template.name}': {missing_vars}")
+            raise ValueError(
+                f"Missing required variables for prompt '{template.name}': {missing_vars}"
+            )
 
         # Clean variables (convert None or empty to empty string/lists)
         formatted_vars = {}
@@ -26,4 +30,6 @@ class PromptBuilder:
         try:
             return template.template.format(**formatted_vars)
         except Exception as e:
-            raise ValueError(f"Failed to build prompt '{template.name}': {str(e)}") from e
+            raise ValueError(
+                f"Failed to build prompt '{template.name}': {str(e)}"
+            ) from e

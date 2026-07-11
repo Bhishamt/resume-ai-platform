@@ -66,7 +66,9 @@ class LocalStorage(BaseStorage):
         """
         path = Path(storage_path).resolve()
         if not str(path).startswith(str(self._upload_dir)):
-            logger.warning("LocalStorage.delete blocked — path outside upload dir: %s", path)
+            logger.warning(
+                "LocalStorage.delete blocked — path outside upload dir: %s", path
+            )
             return
 
         if path.is_file():

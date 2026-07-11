@@ -1,5 +1,6 @@
 import json
-from typing import Dict, Any
+from typing import Any, Dict
+
 
 class ResponseParser:
     @staticmethod
@@ -12,16 +13,16 @@ class ResponseParser:
             return {}
 
         cleaned = response_text.strip()
-        
+
         # Remove markdown code block fences if present
         if cleaned.startswith("```json"):
             cleaned = cleaned[7:]
         elif cleaned.startswith("```"):
             cleaned = cleaned[3:]
-        
+
         if cleaned.endswith("```"):
             cleaned = cleaned[:-3]
-            
+
         cleaned = cleaned.strip()
 
         try:
@@ -32,7 +33,9 @@ class ResponseParser:
             end = cleaned.rfind("}")
             if start != -1 and end != -1:
                 try:
-                    return json.loads(cleaned[start:end + 1])
+                    return json.loads(cleaned[start : end + 1])
                 except json.JSONDecodeError:
                     pass
-            raise ValueError(f"AI response is not valid JSON. Failed to parse: {str(e)}") from e
+            raise ValueError(
+                f"AI response is not valid JSON. Failed to parse: {str(e)}"
+            ) from e

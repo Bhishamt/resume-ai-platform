@@ -17,12 +17,10 @@ to push updates after long-running jobs complete.
 import json
 import logging
 from typing import Dict, List
-from uuid import UUID
 
 import jwt
 from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
 
-from app.core.config import settings
 from app.utils.jwt_utils import decode_token
 
 logger = logging.getLogger(__name__)
@@ -42,7 +40,11 @@ class ConnectionManager:
         if user_id not in self._active:
             self._active[user_id] = []
         self._active[user_id].append(websocket)
-        logger.info("WS connected: user=%s total_connections=%d", user_id, self.total_connections)
+        logger.info(
+            "WS connected: user=%s total_connections=%d",
+            user_id,
+            self.total_connections,
+        )
 
     def disconnect(self, websocket: WebSocket, user_id: str) -> None:
         if user_id in self._active:
@@ -52,7 +54,11 @@ class ConnectionManager:
                 pass
             if not self._active[user_id]:
                 del self._active[user_id]
-        logger.info("WS disconnected: user=%s total_connections=%d", user_id, self.total_connections)
+        logger.info(
+            "WS disconnected: user=%s total_connections=%d",
+            user_id,
+            self.total_connections,
+        )
 
     async def send_to_user(self, user_id: str, payload: dict) -> None:
         """Send a JSON message to all connections for a given user."""
@@ -107,18 +113,24 @@ async def websocket_notifications(
     """
     user_id = _authenticate_token(token)
     if not user_id:
-        await websocket.close(code=4001, reason="Unauthorized: invalid or expired token")
+        await websocket.close(
+            code=4001, reason="Unauthorized: invalid or expired token"
+        )
         logger.warning("WS rejected: invalid token")
         return
 
     await manager.connect(websocket, user_id)
 
     # Send welcome handshake
-    await websocket.send_text(json.dumps({
-        "type": "connected",
-        "message": "Real-time notifications active",
-        "user_id": user_id,
-    }))
+    await websocket.send_text(
+        json.dumps(
+            {
+                "type": "connected",
+                "message": "Real-time notifications active",
+                "user_id": user_id,
+            }
+        )
+    )
 
     try:
         while True:

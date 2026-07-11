@@ -12,19 +12,14 @@ Tests cover:
 
 import uuid
 from datetime import datetime, timezone
-from typing import Generator
 from unittest.mock import MagicMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
-from app.database.base_class import Base
+from app.api.dependencies import get_admin_user, get_current_user, get_db
 from app.main import app
-from app.api.dependencies import get_db, get_admin_user, get_current_user
 from app.models.user import User
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -96,16 +91,12 @@ def client_unauthenticated() -> TestClient:
 class TestRBAC:
     """Verify that admin routes are protected and reject non-admin users."""
 
-    def test_admin_dashboard_requires_auth(
-        self, client_unauthenticated: TestClient
-    ):
+    def test_admin_dashboard_requires_auth(self, client_unauthenticated: TestClient):
         """Unauthenticated request must return 401 or 422."""
         resp = client_unauthenticated.get("/api/v1/admin/dashboard")
         assert resp.status_code in (401, 422)
 
-    def test_admin_dashboard_blocks_regular_user(
-        self, client_as_user: TestClient
-    ):
+    def test_admin_dashboard_blocks_regular_user(self, client_as_user: TestClient):
         """Regular user must receive 403 Forbidden."""
         resp = client_as_user.get(
             "/api/v1/admin/dashboard",
@@ -179,9 +170,7 @@ class TestDashboard:
 
 
 class TestUserManagement:
-    def test_list_users_returns_paginated_data(
-        self, client_as_admin: TestClient
-    ):
+    def test_list_users_returns_paginated_data(self, client_as_admin: TestClient):
         with patch(
             "app.api.v1.endpoints.admin.user_management.list_users"
         ) as mock_list:
@@ -257,9 +246,7 @@ class TestUserManagement:
 
 class TestAuditLogs:
     def test_get_logs_returns_list(self, client_as_admin: TestClient):
-        with patch(
-            "app.api.v1.endpoints.admin.log_service.get_logs"
-        ) as mock_logs:
+        with patch("app.api.v1.endpoints.admin.log_service.get_logs") as mock_logs:
             from app.schemas.admin import AdminLogListResponse, PaginatedMeta
 
             mock_logs.return_value = AdminLogListResponse(
@@ -273,9 +260,7 @@ class TestAuditLogs:
             assert body["data"]["meta"]["page"] == 1
 
     def test_logs_support_action_filter(self, client_as_admin: TestClient):
-        with patch(
-            "app.api.v1.endpoints.admin.log_service.get_logs"
-        ) as mock_logs:
+        with patch("app.api.v1.endpoints.admin.log_service.get_logs") as mock_logs:
             from app.schemas.admin import AdminLogListResponse, PaginatedMeta
 
             mock_logs.return_value = AdminLogListResponse(
@@ -298,9 +283,7 @@ class TestAuditLogs:
 
 class TestSettings:
     def test_get_settings(self, client_as_admin: TestClient):
-        with patch(
-            "app.api.v1.endpoints.admin.settings_service.get_all"
-        ) as mock_get:
+        with patch("app.api.v1.endpoints.admin.settings_service.get_all") as mock_get:
             from app.schemas.admin import SettingsListResponse
 
             mock_get.return_value = SettingsListResponse(settings=[])
@@ -349,7 +332,8 @@ class TestNotifications:
         with patch(
             "app.api.v1.endpoints.admin.notification_service.list_notifications"
         ) as mock_list:
-            from app.schemas.admin import NotificationListResponse, PaginatedMeta
+            from app.schemas.admin import (NotificationListResponse,
+                                           PaginatedMeta)
 
             mock_list.return_value = NotificationListResponse(
                 notifications=[],

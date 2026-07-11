@@ -10,11 +10,13 @@ Creates three tables required for Phase 9 — Enterprise Admin Panel:
   - notifications  : in-app notification centre
 
 """
+
 from typing import Sequence, Union
 
 import sqlalchemy as sa
-from alembic import op
 from sqlalchemy.dialects import postgresql
+
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "f1c9d2a3e4b5"
@@ -150,8 +152,7 @@ def upgrade() -> None:
     # ------------------------------------------------------------------
     # Seed default system settings
     # ------------------------------------------------------------------
-    op.execute(
-        """
+    op.execute("""
         INSERT INTO system_settings (id, key, value, description, updated_at)
         VALUES
           (gen_random_uuid(), 'max_upload_size_mb', '10',
@@ -167,8 +168,7 @@ def upgrade() -> None:
           (gen_random_uuid(), 'session_timeout_minutes', '30',
            'JWT access token expiry in minutes', NOW())
         ON CONFLICT (key) DO NOTHING;
-        """
-    )
+        """)
 
 
 def downgrade() -> None:

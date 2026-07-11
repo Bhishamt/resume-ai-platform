@@ -1,8 +1,10 @@
 import os
+
 from app.core.exceptions import BadRequestError
 from app.services.parser.base_parser import BaseParser
-from app.services.parser.pdf_parser import PDFParser
 from app.services.parser.docx_parser import DOCXParser
+from app.services.parser.pdf_parser import PDFParser
+
 
 class ParserFactory:
     """Factory class to retrieve the appropriate parser based on file characteristics."""
@@ -20,5 +22,7 @@ class ParserFactory:
             "application/msword",
         ]:
             return DOCXParser()
-        
-        raise BadRequestError(f"Unsupported file format: {ext or mime_type}. Only PDF and DOCX are allowed.")
+
+        raise BadRequestError(
+            f"Unsupported file format: {ext or mime_type}. Only PDF and DOCX are allowed."
+        )

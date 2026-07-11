@@ -1,13 +1,12 @@
-import pytest
 from uuid import uuid4
-from fastapi import status
-from app.services.ats.section_detector import SectionDetector
-from app.services.ats.keyword_analyzer import KeywordAnalyzer
-from app.services.ats.formatting_checker import FormattingChecker
-from app.services.ats.score_calculator import ScoreCalculator
-from app.services.ats.ats_engine import AtsEngine
+
+import pytest
+
 from app.models.resume import Resume
-from app.models.analysis_report import AnalysisReport
+from app.services.ats.formatting_checker import FormattingChecker
+from app.services.ats.keyword_analyzer import KeywordAnalyzer
+from app.services.ats.score_calculator import ScoreCalculator
+from app.services.ats.section_detector import SectionDetector
 
 # Dummy resume text for testing
 TEST_RESUME_TEXT = """
@@ -39,6 +38,7 @@ Certifications
 - AWS Certified Developer
 """
 
+
 class TestAtsEngineHeuristics:
     def test_section_detector(self):
         res = SectionDetector.detect_sections(TEST_RESUME_TEXT)
@@ -55,11 +55,18 @@ class TestAtsEngineHeuristics:
         res = KeywordAnalyzer.analyze_keywords(TEST_RESUME_TEXT)
         assert "Python" in res["found_by_category"]["Technical Skills"]
         assert "React" in res["found_by_category"]["Technical Skills"]
-        assert "Fastapi" in res["found_by_category"]["Technical Skills"] or "FASTAPI" in res["found_by_category"]["Technical Skills"]
+        assert (
+            "Fastapi" in res["found_by_category"]["Technical Skills"]
+            or "FASTAPI" in res["found_by_category"]["Technical Skills"]
+        )
         assert "LED" in res["found_by_category"]["Action Verbs"]
         assert "Optimized" in res["found_by_category"]["Action Verbs"]
-        assert "Software Development" in res["found_by_category"]["Industry Keywords"] or "Saas" in res["found_by_category"]["Industry Keywords"] or "Cloud Computing" in res["found_by_category"]["Industry Keywords"]
-        
+        assert (
+            "Software Development" in res["found_by_category"]["Industry Keywords"]
+            or "Saas" in res["found_by_category"]["Industry Keywords"]
+            or "Cloud Computing" in res["found_by_category"]["Industry Keywords"]
+        )
+
         # Check missing recommended critical keywords
         # The test resume text has: Python, Javascript, React, SQL, Docker, AWS, Git, FastAPI, CI/CD, Agile is missing
         assert "Agile" in res["missing_keywords"]
@@ -76,10 +83,11 @@ class TestAtsEngineHeuristics:
 
     def test_score_calculator(self):
         # Experience Years
-        exp_score, years = ScoreCalculator.calculate_experience_score(TEST_RESUME_TEXT, ["led", "optimized", "integrated"])
+        exp_score, years = ScoreCalculator.calculate_experience_score(
+            TEST_RESUME_TEXT, ["led", "optimized", "integrated"]
+        )
         assert years >= 5
         assert exp_score >= 60
-
 
         # Education
         edu_score = ScoreCalculator.calculate_education_score(TEST_RESUME_TEXT)
@@ -97,14 +105,14 @@ class TestAtsEngineHeuristics:
             "projects_score": 75,
             "education_score": 100,
             "grammar_score": 95,
-            "section_score": 100
+            "section_score": 100,
         }
         final_score = ScoreCalculator.calculate_final_score(cat_scores)
         assert final_score == 87
 
 
-
 # ---------- API and Endpoint Integration Tests ----------
+
 
 class TestAnalysisEndpoints:
     @pytest.fixture
@@ -112,8 +120,13 @@ class TestAnalysisEndpoints:
         """Create a mock resume in DB."""
         # Query the user
         from app.models.user import User
-        user = db_session.query(User).filter(User.email == registered_user["email"]).first()
-        
+
+        user = (
+            db_session.query(User)
+            .filter(User.email == registered_user["email"])
+            .first()
+        )
+
         resume = Resume(
             user_id=user.id,
             title="Jane Doe Resume",
@@ -123,7 +136,7 @@ class TestAnalysisEndpoints:
             file_size=1024,
             upload_status="success",
             storage_path="uploads/jane_doe_stored.pdf",
-            parsed_text=TEST_RESUME_TEXT
+            parsed_text=TEST_RESUME_TEXT,
         )
         db_session.add(resume)
         db_session.commit()
@@ -132,8 +145,7 @@ class TestAnalysisEndpoints:
 
     def test_create_analysis_report_success(self, client, auth_headers, mock_resume):
         response = client.post(
-            f"/api/v1/analysis/{mock_resume.id}",
-            headers=auth_headers
+            f"/api/v1/analysis/{mock_resume.id}", headers=auth_headers
         )
         assert response.status_code == 201
         data = response.json()
@@ -142,7 +154,7 @@ class TestAnalysisEndpoints:
         assert "ats_score" in data["data"]
         assert len(data["data"]["strengths"]) > 0
         assert len(data["data"]["suggestions"]) > 0
-        
+
         # Verify scoring explanations exist and are structured correctly
         assert "scoring_explanations" in data["data"]
         exps = data["data"]["scoring_explanations"]
@@ -156,17 +168,14 @@ class TestAnalysisEndpoints:
 
     def test_create_analysis_report_not_found(self, client, auth_headers):
         random_uuid = uuid4()
-        response = client.post(
-            f"/api/v1/analysis/{random_uuid}",
-            headers=auth_headers
-        )
+        response = client.post(f"/api/v1/analysis/{random_uuid}", headers=auth_headers)
         assert response.status_code == 404
         assert "not found" in response.json()["message"].lower()
 
     def test_get_analyses_list(self, client, auth_headers, mock_resume, db_session):
         # Create a report first
         client.post(f"/api/v1/analysis/{mock_resume.id}", headers=auth_headers)
-        
+
         response = client.get("/api/v1/analysis", headers=auth_headers)
         assert response.status_code == 200
         data = response.json()
@@ -176,7 +185,9 @@ class TestAnalysisEndpoints:
 
     def test_get_analysis_details(self, client, auth_headers, mock_resume):
         # Create
-        create_resp = client.post(f"/api/v1/analysis/{mock_resume.id}", headers=auth_headers)
+        create_resp = client.post(
+            f"/api/v1/analysis/{mock_resume.id}", headers=auth_headers
+        )
         report_id = create_resp.json()["data"]["id"]
 
         # Get details
@@ -188,7 +199,9 @@ class TestAnalysisEndpoints:
 
     def test_delete_analysis_report(self, client, auth_headers, mock_resume):
         # Create
-        create_resp = client.post(f"/api/v1/analysis/{mock_resume.id}", headers=auth_headers)
+        create_resp = client.post(
+            f"/api/v1/analysis/{mock_resume.id}", headers=auth_headers
+        )
         report_id = create_resp.json()["data"]["id"]
 
         # Delete

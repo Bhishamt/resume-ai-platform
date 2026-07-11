@@ -1,8 +1,9 @@
 """Tests for Celery tasks — run synchronously via CELERY_TASK_ALWAYS_EAGER=True."""
 
 import os
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 # Force eager mode before importing tasks
 os.environ.setdefault("CELERY_TASK_ALWAYS_EAGER", "true")
@@ -40,8 +41,10 @@ class TestResumeParsingTask:
         mock_parser = MagicMock()
         mock_parser.parse.return_value = {"raw_text": "John Doe — Software Engineer"}
 
-        with patch("app.database.base.SessionLocal", return_value=mock_db), \
-             patch("app.services.parser.parser_factory.ParserFactory.get_parser", return_value=mock_parser):
+        with patch("app.database.base.SessionLocal", return_value=mock_db), patch(
+            "app.services.parser.parser_factory.ParserFactory.get_parser",
+            return_value=mock_parser,
+        ):
             result = parse_resume_async.run(
                 resume_id="00000000-0000-0000-0000-000000000001",
                 storage_path="/tmp/resume.pdf",
@@ -54,16 +57,18 @@ class TestResumeParsingTask:
 
     def test_parse_resume_parser_failure(self):
         """Task sets upload_status='parse_failed' when parser raises an exception."""
-        from app.tasks.resume_tasks import parse_resume_async
         from celery.exceptions import Retry
+
+        from app.tasks.resume_tasks import parse_resume_async
 
         mock_resume = MagicMock()
         mock_db = MagicMock()
         mock_db.query.return_value.filter.return_value.first.return_value = mock_resume
 
-        with patch("app.database.base.SessionLocal", return_value=mock_db), \
-             patch("app.services.parser.parser_factory.ParserFactory.get_parser", side_effect=RuntimeError("corrupt file")), \
-             pytest.raises((Retry, RuntimeError)):
+        with patch("app.database.base.SessionLocal", return_value=mock_db), patch(
+            "app.services.parser.parser_factory.ParserFactory.get_parser",
+            side_effect=RuntimeError("corrupt file"),
+        ), pytest.raises((Retry, RuntimeError)):
             parse_resume_async.run(
                 resume_id="00000000-0000-0000-0000-000000000001",
                 storage_path="/tmp/bad.pdf",
@@ -127,9 +132,14 @@ class TestNotificationTask:
         async def async_true():
             return True
 
-        mock_service.send_welcome = MagicMock(return_value=asyncio.coroutine(lambda: True)())
+        mock_service.send_welcome = MagicMock(
+            return_value=asyncio.coroutine(lambda: True)()
+        )
 
-        with patch("app.services.email.email_service.get_email_service", return_value=mock_service):
+        with patch(
+            "app.services.email.email_service.get_email_service",
+            return_value=mock_service,
+        ):
             with patch("app.tasks.notification_tasks._run_async", return_value=True):
                 result = send_welcome_email_task.run(
                     user_email="test@example.com",
@@ -147,8 +157,9 @@ class TestCleanupTask:
         """Handles missing upload directory gracefully."""
         from app.tasks.cleanup_tasks import cleanup_orphaned_files
 
-        with patch("app.core.config.settings") as mock_settings, \
-             patch("app.database.base.SessionLocal") as mock_session:
+        with patch("app.core.config.settings") as mock_settings, patch(
+            "app.database.base.SessionLocal"
+        ) as mock_session:
             mock_settings.UPLOAD_DIR = str(tmp_path / "nonexistent")
             mock_db = MagicMock()
             mock_db.query.return_value.all.return_value = []

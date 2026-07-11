@@ -1,4 +1,5 @@
-from typing import List, Dict
+from typing import Dict, List
+
 
 class RecommendationEngine:
     @classmethod
@@ -9,10 +10,10 @@ class RecommendationEngine:
         missing_keywords: List[str],
         experience_score: int,
         education_score: int,
-        similarity_score: int
+        similarity_score: int,
     ) -> Dict:
         """Analyze matching scores and missing gaps to generate actionable recommendations.
-        
+
         Returns:
             Dict containing:
                 - recommendations: list of strings
@@ -39,7 +40,7 @@ class RecommendationEngine:
             recommendations.append(
                 "Expand on your work history and highlight senior responsibilities or domain-specific achievements."
             )
-            
+
         # 4. Evaluate education gap
         if education_score < 70:
             recommendations.append(
@@ -54,7 +55,9 @@ class RecommendationEngine:
 
         # Fallback if everything is perfect
         if not recommendations:
-            recommendations.append("Your resume aligns exceptionally well with this job description. Tailor key achievements to maximize impact.")
+            recommendations.append(
+                "Your resume aligns exceptionally well with this job description. Tailor key achievements to maximize impact."
+            )
 
         # Determine priority
         if overall_score < 60:
@@ -64,7 +67,4 @@ class RecommendationEngine:
         else:
             priority = "Low"
 
-        return {
-            "recommendations": recommendations,
-            "improvement_priority": priority
-        }
+        return {"recommendations": recommendations, "improvement_priority": priority}

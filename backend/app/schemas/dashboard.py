@@ -1,12 +1,16 @@
-from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any
-from uuid import UUID
 from datetime import datetime
+from typing import Dict, List, Optional
+
+from pydantic import BaseModel, Field
+
 
 class DashboardPreferencesUpdate(BaseModel):
     layout: Optional[List[str]] = Field(None, description="Ordered widget ID list")
-    widgets: Optional[Dict[str, bool]] = Field(None, description="Widget toggling state map")
+    widgets: Optional[Dict[str, bool]] = Field(
+        None, description="Widget toggling state map"
+    )
     theme: Optional[str] = Field(None, description="Dashboard interface theme")
+
 
 class DashboardPreferencesResponse(BaseModel):
     layout: List[str]

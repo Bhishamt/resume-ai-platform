@@ -1,5 +1,7 @@
 import fitz  # PyMuPDF
+
 from app.services.parser.base_parser import BaseParser, ParsedResumeData
+
 
 class PDFParser(BaseParser):
     """Resume parser implementation for PDF documents."""
@@ -12,7 +14,7 @@ class PDFParser(BaseParser):
             with fitz.open(file_path) as doc:
                 for page in doc:
                     raw_text += page.get_text()
-        except Exception as e:
+        except Exception:
             # Fallback/Empty text if parsing fails
             raw_text = ""
 

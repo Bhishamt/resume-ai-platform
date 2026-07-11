@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
     queue="ai",
     max_retries=2,
     default_retry_delay=120,
-    soft_time_limit=300,   # 5 min soft limit
-    time_limit=360,        # 6 min hard limit
+    soft_time_limit=300,  # 5 min soft limit
+    time_limit=360,  # 6 min hard limit
 )
 def run_ai_analysis_async(
     self,
@@ -65,7 +65,9 @@ def run_ai_analysis_async(
             )
             logger.info(
                 "AI analysis complete: type=%s resume_id=%s feedback_id=%s",
-                request_type, resume_id, feedback.id,
+                request_type,
+                resume_id,
+                feedback.id,
             )
             return {
                 "status": "complete",
@@ -113,22 +115,31 @@ def run_job_match_async(
 
     logger.info(
         "run_job_match_async: resume_id=%s jd_id=%s",
-        resume_id, job_description_id,
+        resume_id,
+        job_description_id,
     )
 
     db = SessionLocal()
     try:
         resume = db.query(Resume).filter(Resume.id == UUID(resume_id)).first()
-        job_desc = db.query(JobDescription).filter(
-            JobDescription.id == UUID(job_description_id)
-        ).first()
+        job_desc = (
+            db.query(JobDescription)
+            .filter(JobDescription.id == UUID(job_description_id))
+            .first()
+        )
 
         if not resume or not job_desc:
             return {"status": "not_found", "resume_id": resume_id}
 
         try:
-            match = run_matching(db=db, resume=resume, job_description=job_desc, user_id=UUID(user_id))
-            logger.info("Job match complete: match_id=%s score=%.1f", match.id, match.match_score)
+            match = run_matching(
+                db=db, resume=resume, job_description=job_desc, user_id=UUID(user_id)
+            )
+            logger.info(
+                "Job match complete: match_id=%s score=%.1f",
+                match.id,
+                match.match_score,
+            )
             return {
                 "status": "complete",
                 "resume_id": resume_id,

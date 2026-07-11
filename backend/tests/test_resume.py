@@ -2,11 +2,13 @@
 
 import os
 from pathlib import Path
-import pytest
-import fitz
+
 import docx
-from fastapi import status
+import fitz
+import pytest
+
 from app.core.config import settings
+
 
 @pytest.fixture
 def temp_pdf(tmp_path) -> Path:
@@ -19,11 +21,12 @@ def temp_pdf(tmp_path) -> Path:
         "Jane Smith\njane.smith@example.com\n(555) 019-2834\n"
         "Skills: Python, Javascript, React, Docker, SQL\n"
         "Education: Bachelor of Computer Science, University of California\n"
-        "Experience: Software Engineer Intern, Tech Corp"
+        "Experience: Software Engineer Intern, Tech Corp",
     )
     doc.save(str(file_path))
     doc.close()
     return file_path
+
 
 @pytest.fixture
 def temp_docx(tmp_path) -> Path:
@@ -34,10 +37,13 @@ def temp_docx(tmp_path) -> Path:
     doc.add_paragraph("jane.smith@example.com")
     doc.add_paragraph("(555) 019-2834")
     doc.add_paragraph("Skills: Python, Javascript, React, Docker, SQL")
-    doc.add_paragraph("Education: Bachelor of Computer Science, University of California")
+    doc.add_paragraph(
+        "Education: Bachelor of Computer Science, University of California"
+    )
     doc.add_paragraph("Experience: Software Engineer Intern, Tech Corp")
     doc.save(str(file_path))
     return file_path
+
 
 @pytest.fixture
 def temp_txt(tmp_path) -> Path:
@@ -46,6 +52,7 @@ def temp_txt(tmp_path) -> Path:
     with open(file_path, "w") as f:
         f.write("This is unsupported text format.")
     return file_path
+
 
 @pytest.fixture
 def other_user_auth(client):
@@ -65,6 +72,7 @@ def other_user_auth(client):
 
 
 # ---------- File Upload Tests ----------
+
 
 class TestResumeUpload:
     def test_upload_pdf_success(self, client, auth_headers, temp_pdf):
@@ -141,7 +149,7 @@ class TestResumeUpload:
         # Write 100 bytes to be larger than 50 bytes limit
         with open(file_path, "wb") as f:
             f.write(b"0" * 100)
-            
+
         with open(file_path, "rb") as f:
             response = client.post(
                 "/api/v1/resumes/upload",
@@ -153,6 +161,7 @@ class TestResumeUpload:
 
 
 # ---------- Details, Delete, Replace & Ownership ----------
+
 
 class TestResumeManagement:
     @pytest.fixture
@@ -189,7 +198,9 @@ class TestResumeManagement:
         assert data["data"]["id"] == uploaded_resume["id"]
         assert "Jane Smith" in data["data"]["parsed_text"]
 
-    def test_get_resume_details_unauthorized(self, client, other_user_auth, uploaded_resume):
+    def test_get_resume_details_unauthorized(
+        self, client, other_user_auth, uploaded_resume
+    ):
         """Verifies ownership check: other user cannot fetch User A's resume details."""
         response = client.get(
             f"/api/v1/resumes/{uploaded_resume['id']}",
@@ -225,12 +236,12 @@ class TestResumeManagement:
         data = response.json()
         assert data["data"]["id"] == uploaded_resume["id"]
         assert data["data"]["original_filename"] == "replaced.docx"
-        
+
         # Verify old file was deleted from disk and new file exists
         assert not os.path.exists(old_path)
         new_path = data["data"]["storage_path"]
         assert os.path.exists(new_path)
-        
+
         # Cleanup
         os.remove(new_path)
 
@@ -259,6 +270,7 @@ class TestResumeManagement:
 
 # ---------- Upload History Tests ----------
 
+
 class TestUploadHistory:
     def test_get_history(self, client, auth_headers, temp_pdf):
         # 1. Perform upload
@@ -268,7 +280,7 @@ class TestUploadHistory:
                 files={"file": ("test_resume.pdf", f, "application/pdf")},
                 headers=auth_headers,
             )
-        
+
         # 2. Get history
         response = client.get("/api/v1/resumes/history", headers=auth_headers)
         assert response.status_code == 200
@@ -276,7 +288,7 @@ class TestUploadHistory:
         assert data["success"] is True
         assert len(data["data"]) >= 1
         assert data["data"][0]["action"] == "upload"
-        
+
         # Clean up files created in test
         # (We can fetch the list and delete the files physically)
         list_resp = client.get("/api/v1/resumes", headers=auth_headers)

@@ -19,7 +19,6 @@ from app.models.resume import Resume
 from app.models.system_setting import SystemSetting
 from app.models.user import User
 
-
 # ---------------------------------------------------------------------------
 # Users
 # ---------------------------------------------------------------------------
@@ -85,16 +84,11 @@ def count_users(db: Session) -> int:
 
 
 def count_active_users(db: Session) -> int:
-    return db.query(func.count(User.id)).filter(User.is_active == True).scalar() or 0
+    return db.query(func.count(User.id)).filter(User.is_active).scalar() or 0
 
 
 def count_new_users_since(db: Session, since: datetime) -> int:
-    return (
-        db.query(func.count(User.id))
-        .filter(User.created_at >= since)
-        .scalar()
-        or 0
-    )
+    return db.query(func.count(User.id)).filter(User.created_at >= since).scalar() or 0
 
 
 def count_resumes(db: Session) -> int:
@@ -103,9 +97,7 @@ def count_resumes(db: Session) -> int:
 
 def count_resumes_since(db: Session, since: datetime) -> int:
     return (
-        db.query(func.count(Resume.id))
-        .filter(Resume.upload_date >= since)
-        .scalar()
+        db.query(func.count(Resume.id)).filter(Resume.upload_date >= since).scalar()
         or 0
     )
 
@@ -196,7 +188,11 @@ def get_ats_score_distribution(db: Session) -> List[dict]:
     """Count analysis reports bucketed into ATS score ranges."""
     rows = db.query(AnalysisReport.ats_score).all()
     buckets = {
-        "0-20": 0, "21-40": 0, "41-60": 0, "61-80": 0, "81-100": 0,
+        "0-20": 0,
+        "21-40": 0,
+        "41-60": 0,
+        "61-80": 0,
+        "81-100": 0,
     }
     for (score,) in rows:
         if score is None:
@@ -272,9 +268,7 @@ def get_admin_logs(
     if admin_id:
         query = query.filter(AdminLog.admin_id == admin_id)
     total = query.count()
-    logs = (
-        query.order_by(AdminLog.created_at.desc()).offset(skip).limit(limit).all()
-    )
+    logs = query.order_by(AdminLog.created_at.desc()).offset(skip).limit(limit).all()
     return logs, total
 
 
@@ -360,9 +354,7 @@ def create_notification(
     return notif
 
 
-def mark_notification_read(
-    db: Session, notification: Notification
-) -> Notification:
+def mark_notification_read(db: Session, notification: Notification) -> Notification:
     notification.is_read = True
     db.commit()
     db.refresh(notification)
@@ -373,7 +365,7 @@ def mark_all_notifications_read(db: Session, user_id: UUID) -> int:
     """Mark all unread notifications for a user as read. Returns updated count."""
     count = (
         db.query(Notification)
-        .filter(Notification.user_id == user_id, Notification.is_read == False)
+        .filter(Notification.user_id == user_id, not Notification.is_read)
         .update({"is_read": True})
     )
     db.commit()
@@ -383,7 +375,7 @@ def mark_all_notifications_read(db: Session, user_id: UUID) -> int:
 def get_unread_count(db: Session, user_id: UUID) -> int:
     return (
         db.query(func.count(Notification.id))
-        .filter(Notification.user_id == user_id, Notification.is_read == False)
+        .filter(Notification.user_id == user_id, not Notification.is_read)
         .scalar()
         or 0
     )

@@ -56,12 +56,40 @@ export function Hero() {
           transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
           className="mt-20 mx-auto max-w-5xl"
         >
-          <div className="glass-panel p-2">
-            <div className="rounded-[var(--radius-md)] overflow-hidden border border-white/5 bg-black/50 aspect-video relative">
-               <div className="absolute inset-0 flex items-center justify-center text-white/20">
-                  Dashboard Preview Graphic
-               </div>
+          <div className="glass-panel p-2 md:p-4 rounded-xl">
+            <div className="rounded-[var(--radius-md)] overflow-hidden border border-white/10 bg-black/50 relative shadow-2xl shadow-indigo-500/20">
+               <img 
+                 src="/src/assets/images/dashboard-preview.png" 
+                 alt="AI Resume Analyzer Dashboard" 
+                 className="w-full h-auto object-cover opacity-90 transition-opacity hover:opacity-100"
+               />
+               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
             </div>
+          </div>
+        </motion.div>
+
+        {/* Animated Statistics */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
+          className="mt-16 mx-auto max-w-4xl grid grid-cols-2 md:grid-cols-4 gap-8 px-4"
+        >
+          <div className="flex flex-col items-center">
+            <h4 className="text-3xl md:text-4xl font-extrabold text-white">99%</h4>
+            <p className="text-xs md:text-sm text-white/50 uppercase tracking-widest mt-1">ATS Accuracy</p>
+          </div>
+          <div className="flex flex-col items-center">
+            <h4 className="text-3xl md:text-4xl font-extrabold text-white">50k+</h4>
+            <p className="text-xs md:text-sm text-white/50 uppercase tracking-widest mt-1">Resumes Scanned</p>
+          </div>
+          <div className="flex flex-col items-center">
+            <h4 className="text-3xl md:text-4xl font-extrabold text-white">3.2x</h4>
+            <p className="text-xs md:text-sm text-white/50 uppercase tracking-widest mt-1">More Interviews</p>
+          </div>
+          <div className="flex flex-col items-center">
+            <h4 className="text-3xl md:text-4xl font-extrabold text-white">24/7</h4>
+            <p className="text-xs md:text-sm text-white/50 uppercase tracking-widest mt-1">AI Availability</p>
           </div>
         </motion.div>
       </Container>

@@ -1,5 +1,6 @@
 import re
-from typing import List, Dict
+from typing import Dict, List
+
 
 class SkillMatcher:
     @classmethod
@@ -7,22 +8,24 @@ class SkillMatcher:
         skill_lower = skill.lower().strip()
         if not skill_lower:
             return False
-        
+
         escaped_skill = re.escape(skill_lower)
-        
+
         if skill_lower.endswith("++") or skill_lower.endswith("#"):
             pattern = rf"\b{escaped_skill}"
         elif skill_lower.startswith("."):
             pattern = rf"{escaped_skill}\b"
         else:
             pattern = rf"\b{escaped_skill}\b"
-            
+
         return re.search(pattern, text_lower) is not None
 
     @classmethod
-    def match_skills(cls, resume_text: str, required_skills: List[str], preferred_skills: List[str]) -> Dict:
+    def match_skills(
+        cls, resume_text: str, required_skills: List[str], preferred_skills: List[str]
+    ) -> Dict:
         """Match candidate's resume text against job description skills.
-        
+
         Returns:
             Dict containing scores, matched/missing lists, and explanations.
         """
@@ -34,11 +37,11 @@ class SkillMatcher:
                 "missing_skills": required_skills,
                 "matching_preferred": [],
                 "missing_preferred": preferred_skills,
-                "reasons": [{"rule": "Resume text is empty", "points": -40.0}]
+                "reasons": [{"rule": "Resume text is empty", "points": -40.0}],
             }
 
         text_lower = resume_text.lower()
-        
+
         matching_required = []
         missing_required = []
         for skill in required_skills:
@@ -79,22 +82,29 @@ class SkillMatcher:
 
         # Generate explanations (deductions out of 40 points)
         reasons = []
-        
+
         if required_count > 0:
             req_pool = 32.0 if preferred_count > 0 else 40.0
             pts_per_req = req_pool / required_count
             for skill in matching_required:
                 reasons.append({"rule": f"{skill} matched", "points": 0.0})
             for skill in missing_required:
-                reasons.append({"rule": f"{skill} missing", "points": -round(pts_per_req, 2)})
-                
+                reasons.append(
+                    {"rule": f"{skill} missing", "points": -round(pts_per_req, 2)}
+                )
+
         if preferred_count > 0:
             pref_pool = 8.0
             pts_per_pref = pref_pool / preferred_count
             for skill in matching_preferred:
                 reasons.append({"rule": f"{skill} matched (preferred)", "points": 0.0})
             for skill in missing_preferred:
-                reasons.append({"rule": f"{skill} missing (preferred)", "points": -round(pts_per_pref, 2)})
+                reasons.append(
+                    {
+                        "rule": f"{skill} missing (preferred)",
+                        "points": -round(pts_per_pref, 2),
+                    }
+                )
 
         return {
             "score": int(round(category_score)),
@@ -103,5 +113,5 @@ class SkillMatcher:
             "missing_skills": missing_required,
             "matching_preferred": matching_preferred,
             "missing_preferred": missing_preferred,
-            "reasons": reasons
+            "reasons": reasons,
         }

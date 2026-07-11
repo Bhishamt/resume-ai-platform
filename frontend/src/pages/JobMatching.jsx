@@ -162,11 +162,24 @@ export default function JobMatching() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#050505] text-white">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-10 w-10 animate-spin text-white/50" />
-          <p className="text-sm text-white/55">Loading job matching workbench...</p>
-        </div>
+      <div className="min-h-screen bg-[#050505] text-white">
+        <div className="h-24" />
+        <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <div className="h-8 w-64 bg-white/5 rounded-md animate-pulse mb-2" />
+              <div className="h-4 w-96 bg-white/5 rounded-md animate-pulse" />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-5 space-y-6">
+              <div className="h-[600px] w-full bg-white/[0.02] border border-white/5 rounded-xl animate-pulse" />
+            </div>
+            <div className="lg:col-span-7 space-y-6">
+              <div className="h-[400px] w-full bg-white/[0.02] border border-white/5 rounded-xl animate-pulse" />
+            </div>
+          </div>
+        </main>
       </div>
     );
   }

@@ -1,18 +1,18 @@
 import logging
-from typing import Dict, Any, Optional, List
-from uuid import UUID
 from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
+from uuid import UUID
+
 from sqlalchemy.orm import Session
 
-from app.models.dashboard_preferences import DashboardPreferences
-from app.models.upload_history import UploadHistory
-from app.models.job_match import JobMatch
 from app.models.ai_feedback import AIFeedback
-
-from app.services.dashboard.statistics_service import StatisticsService
-from app.services.dashboard.trend_service import TrendService
+from app.models.dashboard_preferences import DashboardPreferences
+from app.models.job_match import JobMatch
+from app.models.upload_history import UploadHistory
 from app.services.dashboard.analytics_service import AnalyticsService
 from app.services.dashboard.recommendation_service import RecommendationService
+from app.services.dashboard.statistics_service import StatisticsService
+from app.services.dashboard.trend_service import TrendService
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ DEFAULT_WIDGETS = {
     "missing_skills": True,
     "career_insights": True,
     "ai_usage": True,
-    "recent_activity": True
+    "recent_activity": True,
 }
 
 DEFAULT_LAYOUT = [
@@ -38,8 +38,9 @@ DEFAULT_LAYOUT = [
     "missing_skills",
     "career_insights",
     "ai_usage",
-    "recent_activity"
+    "recent_activity",
 ]
+
 
 class DashboardService:
     @staticmethod
@@ -47,16 +48,18 @@ class DashboardService:
         """
         Fetch or create default dashboard preferences for a user.
         """
-        prefs = db.query(DashboardPreferences).filter(
-            DashboardPreferences.user_id == user_id
-        ).first()
+        prefs = (
+            db.query(DashboardPreferences)
+            .filter(DashboardPreferences.user_id == user_id)
+            .first()
+        )
 
         if not prefs:
             prefs = DashboardPreferences(
                 user_id=user_id,
                 layout=DEFAULT_LAYOUT,
                 widgets=DEFAULT_WIDGETS,
-                theme="dark"
+                theme="dark",
             )
             db.add(prefs)
             db.commit()
@@ -70,7 +73,7 @@ class DashboardService:
         user_id: UUID,
         layout: Optional[List[str]] = None,
         widgets: Optional[Dict[str, bool]] = None,
-        theme: Optional[str] = None
+        theme: Optional[str] = None,
     ) -> DashboardPreferences:
         """
         Update user layout preferences.
@@ -100,48 +103,69 @@ class DashboardService:
         activity = []
 
         # 1. Fetch upload history
-        histories = db.query(UploadHistory).filter(
-            UploadHistory.user_id == user_id
-        ).order_by(UploadHistory.timestamp.desc()).limit(10).all()
+        histories = (
+            db.query(UploadHistory)
+            .filter(UploadHistory.user_id == user_id)
+            .order_by(UploadHistory.timestamp.desc())
+            .limit(10)
+            .all()
+        )
 
         for h in histories:
-            activity.append({
-                "type": "upload",
-                "action": h.action,
-                "title": f"Resume {h.action}ed",
-                "description": h.resume.title if h.resume else "Deleted Resume",
-                "timestamp": h.timestamp.isoformat()
-            })
+            activity.append(
+                {
+                    "type": "upload",
+                    "action": h.action,
+                    "title": f"Resume {h.action}ed",
+                    "description": h.resume.title if h.resume else "Deleted Resume",
+                    "timestamp": h.timestamp.isoformat(),
+                }
+            )
 
         # 2. Fetch Job Matches
-        matches = db.query(JobMatch).join(JobMatch.resume).filter(
-            JobMatch.resume.has(user_id=user_id)
-        ).order_by(JobMatch.created_at.desc()).limit(10).all()
+        matches = (
+            db.query(JobMatch)
+            .join(JobMatch.resume)
+            .filter(JobMatch.resume.has(user_id=user_id))
+            .order_by(JobMatch.created_at.desc())
+            .limit(10)
+            .all()
+        )
 
         for m in matches:
-            company = m.job_description.company if m.job_description else "Unknown Company"
+            company = (
+                m.job_description.company if m.job_description else "Unknown Company"
+            )
             job_title = m.job_description.title if m.job_description else "Position"
-            activity.append({
-                "type": "match",
-                "action": "match",
-                "title": f"Job Match Computed: {m.overall_match}%",
-                "description": f"{job_title} at {company}",
-                "timestamp": m.created_at.isoformat()
-            })
+            activity.append(
+                {
+                    "type": "match",
+                    "action": "match",
+                    "title": f"Job Match Computed: {m.overall_match}%",
+                    "description": f"{job_title} at {company}",
+                    "timestamp": m.created_at.isoformat(),
+                }
+            )
 
         # 3. Fetch AI Feedback
-        feedbacks = db.query(AIFeedback).filter(
-            AIFeedback.user_id == user_id
-        ).order_by(AIFeedback.created_at.desc()).limit(10).all()
+        feedbacks = (
+            db.query(AIFeedback)
+            .filter(AIFeedback.user_id == user_id)
+            .order_by(AIFeedback.created_at.desc())
+            .limit(10)
+            .all()
+        )
 
         for f in feedbacks:
-            activity.append({
-                "type": "ai",
-                "action": f.prompt_type,
-                "title": f"AI {f.prompt_type.replace('_', ' ').title()}",
-                "description": f"Tokens used: {f.token_usage.get('total_tokens', 0)}",
-                "timestamp": f.created_at.isoformat()
-            })
+            activity.append(
+                {
+                    "type": "ai",
+                    "action": f.prompt_type,
+                    "title": f"AI {f.prompt_type.replace('_', ' ').title()}",
+                    "description": f"Tokens used: {f.token_usage.get('total_tokens', 0)}",
+                    "timestamp": f.created_at.isoformat(),
+                }
+            )
 
         # Sort combined chronologically (descending)
         activity.sort(key=lambda x: x["timestamp"], reverse=True)
@@ -164,7 +188,7 @@ class DashboardService:
             "layout": prefs.layout,
             "widgets": prefs.widgets,
             "theme": prefs.theme,
-            "updated_at": prefs.updated_at.isoformat()
+            "updated_at": prefs.updated_at.isoformat(),
         }
 
         return {
@@ -173,5 +197,5 @@ class DashboardService:
             "skills": skills,
             "recommendations": recs,
             "preferences": prefs_data,
-            "recent_activity": activity
+            "recent_activity": activity,
         }

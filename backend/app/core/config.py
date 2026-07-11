@@ -7,7 +7,7 @@ Never hardcode secrets. Never commit .env files.
 import json
 from typing import List, Union
 
-from pydantic import AnyHttpUrl, field_validator
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
 
@@ -51,9 +51,9 @@ class Settings(BaseSettings):
 
     # ── Redis ─────────────────────────────────────────────────────────────────
     REDIS_URL: str = "redis://localhost:6379/0"
-    REDIS_CACHE_TTL: int = 300          # 5 minutes default cache TTL
+    REDIS_CACHE_TTL: int = 300  # 5 minutes default cache TTL
     REDIS_DASHBOARD_CACHE_TTL: int = 60  # 1 minute for dashboard data
-    REDIS_SESSION_TTL: int = 86400       # 24 hours for session cache
+    REDIS_SESSION_TTL: int = 86400  # 24 hours for session cache
 
     # ── Celery ────────────────────────────────────────────────────────────────
     CELERY_BROKER_URL: str = "redis://localhost:6379/1"
@@ -62,7 +62,7 @@ class Settings(BaseSettings):
 
     # ── Email ─────────────────────────────────────────────────────────────────
     EMAIL_PROVIDER: str = "smtp"  # smtp | sendgrid | console
-    EMAIL_ENABLED: bool = False   # Toggle email sending
+    EMAIL_ENABLED: bool = False  # Toggle email sending
 
     # SMTP settings
     SMTP_HOST: str = "smtp.gmail.com"

@@ -5,13 +5,13 @@ from uuid import UUID
 
 import jwt
 from fastapi import Depends, Header
+from sqlalchemy.orm import Session
 
 from app.core.exceptions import AuthenticationError
 from app.database.session import SessionLocal
 from app.models.user import User
 from app.repositories import user_repository
 from app.utils.jwt_utils import decode_token
-from sqlalchemy.orm import Session
 
 
 def get_db() -> Generator:

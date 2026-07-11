@@ -20,7 +20,9 @@ def get_profile(db: Session, user_id: UUID) -> UserResponse:
     return UserResponse.model_validate(user)
 
 
-def update_profile(db: Session, user_id: UUID, update_data: UserProfileUpdate) -> UserResponse:
+def update_profile(
+    db: Session, user_id: UUID, update_data: UserProfileUpdate
+) -> UserResponse:
     """Update a user's profile fields."""
     user = user_repository.get_by_id(db, user_id)
     if not user:

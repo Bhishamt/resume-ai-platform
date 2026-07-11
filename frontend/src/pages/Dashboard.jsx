@@ -270,12 +270,30 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#050505] text-white">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-10 w-10 animate-spin text-white/50" />
-          <p className="text-sm text-white/55">Aggregating career intelligence analytics...</p>
+      <ToastProvider>
+        <div className="min-h-screen bg-[#050505] text-white">
+          <div className="h-24" />
+          <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <div className="h-8 w-64 bg-white/5 rounded-md animate-pulse mb-2" />
+                <div className="h-4 w-96 bg-white/5 rounded-md animate-pulse" />
+              </div>
+              <div className="h-9 w-32 bg-white/5 rounded-xl animate-pulse" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+              <div className="md:col-span-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="glass-card p-5 h-[100px] bg-white/[0.02] border border-white/5 animate-pulse rounded-xl" />
+                ))}
+              </div>
+              {[1, 2, 3, 4].map(i => (
+                <div key={`chart-${i}`} className="md:col-span-6 glass-card p-6 h-[350px] bg-white/[0.02] border border-white/5 animate-pulse rounded-xl" />
+              ))}
+            </div>
+          </main>
         </div>
-      </div>
+      </ToastProvider>
     );
   }
 
@@ -335,44 +353,52 @@ export default function Dashboard() {
           <motion.div layout key="kpi_cards" className="md:col-span-12">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* KPI 1 */}
-              <Card className="glass-card p-5 flex items-center justify-between">
-                <div>
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50">Average ATS Score</h3>
-                  <p className="text-3xl font-semibold mt-1 tracking-tight">{stats.average_ats_score}</p>
-                </div>
-                <ProgressRing percentage={stats.average_ats_score} color="#22c55e" />
-              </Card>
+              <motion.div whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 300 }}>
+                <Card className="glass-card p-5 flex items-center justify-between hover:border-white/20 transition-all duration-300 shadow-lg hover:shadow-green-500/10">
+                  <div>
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50">Average ATS Score</h3>
+                    <p className="text-3xl font-semibold mt-1 tracking-tight">{stats.average_ats_score}</p>
+                  </div>
+                  <ProgressRing percentage={stats.average_ats_score} color="#22c55e" />
+                </Card>
+              </motion.div>
 
               {/* KPI 2 */}
-              <Card className="glass-card p-5 flex items-center justify-between">
-                <div>
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50">Best ATS Score</h3>
-                  <p className="text-3xl font-semibold mt-1 tracking-tight">{stats.best_ats_score}</p>
-                </div>
-                <div className="h-10 w-10 bg-white/5 border border-white/5 rounded-xl flex items-center justify-center">
-                  <TrendingUp className="h-5 w-5 text-white/70" />
-                </div>
-              </Card>
+              <motion.div whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 300 }}>
+                <Card className="glass-card p-5 flex items-center justify-between hover:border-white/20 transition-all duration-300 shadow-lg hover:shadow-purple-500/10">
+                  <div>
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50">Best ATS Score</h3>
+                    <p className="text-3xl font-semibold mt-1 tracking-tight">{stats.best_ats_score}</p>
+                  </div>
+                  <div className="h-10 w-10 bg-white/5 border border-white/5 rounded-xl flex items-center justify-center">
+                    <TrendingUp className="h-5 w-5 text-white/70" />
+                  </div>
+                </Card>
+              </motion.div>
 
               {/* KPI 3 */}
-              <Card className="glass-card p-5 flex items-center justify-between">
-                <div>
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50">Average Job Match</h3>
-                  <p className="text-3xl font-semibold mt-1 tracking-tight">{stats.average_job_match}%</p>
-                </div>
-                <ProgressRing percentage={stats.average_job_match} color="#3b82f6" />
-              </Card>
+              <motion.div whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 300 }}>
+                <Card className="glass-card p-5 flex items-center justify-between hover:border-white/20 transition-all duration-300 shadow-lg hover:shadow-blue-500/10">
+                  <div>
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50">Average Job Match</h3>
+                    <p className="text-3xl font-semibold mt-1 tracking-tight">{stats.average_job_match}%</p>
+                  </div>
+                  <ProgressRing percentage={stats.average_job_match} color="#3b82f6" />
+                </Card>
+              </motion.div>
 
               {/* KPI 4 */}
-              <Card className="glass-card p-5 flex items-center justify-between">
-                <div>
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50">Best Job Match</h3>
-                  <p className="text-3xl font-semibold mt-1 tracking-tight">{stats.best_job_match}%</p>
-                </div>
-                <div className="h-10 w-10 bg-white/5 border border-white/5 rounded-xl flex items-center justify-center">
-                  <Award className="h-5 w-5 text-white/70" />
-                </div>
-              </Card>
+              <motion.div whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 300 }}>
+                <Card className="glass-card p-5 flex items-center justify-between hover:border-white/20 transition-all duration-300 shadow-lg hover:shadow-indigo-500/10">
+                  <div>
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50">Best Job Match</h3>
+                    <p className="text-3xl font-semibold mt-1 tracking-tight">{stats.best_job_match}%</p>
+                  </div>
+                  <div className="h-10 w-10 bg-white/5 border border-white/5 rounded-xl flex items-center justify-center">
+                    <Award className="h-5 w-5 text-white/70" />
+                  </div>
+                </Card>
+              </motion.div>
             </div>
           </motion.div>
         );

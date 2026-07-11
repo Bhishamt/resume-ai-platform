@@ -1,7 +1,7 @@
 """User management service — admin-level CRUD for user accounts."""
 
 import logging
-from typing import List, Optional, Tuple
+from typing import Optional
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -9,7 +9,8 @@ from sqlalchemy.orm import Session
 from app.core.exceptions import BadRequestError, NotFoundError
 from app.models.user import User
 from app.repositories import admin_repository
-from app.schemas.admin import AdminUserListResponse, AdminUserResponse, PaginatedMeta
+from app.schemas.admin import (AdminUserListResponse, AdminUserResponse,
+                               PaginatedMeta)
 from app.services.admin import log_service
 
 logger = logging.getLogger(__name__)
@@ -61,7 +62,9 @@ def update_user(
 ) -> AdminUserResponse:
     """Update a user's role or active status. Logs the change."""
     if user_id == admin.id:
-        raise BadRequestError("Admins cannot modify their own account via this endpoint.")
+        raise BadRequestError(
+            "Admins cannot modify their own account via this endpoint."
+        )
 
     user = admin_repository.get_user_by_id(db, user_id)
     if not user:
@@ -122,7 +125,9 @@ def delete_user(
 ) -> None:
     """Permanently delete a user and all cascaded data. Logs the deletion."""
     if user_id == admin.id:
-        raise BadRequestError("Admins cannot delete their own account via this endpoint.")
+        raise BadRequestError(
+            "Admins cannot delete their own account via this endpoint."
+        )
 
     user = admin_repository.get_user_by_id(db, user_id)
     if not user:

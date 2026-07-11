@@ -8,7 +8,6 @@ Limits:
   - Auth routes:  10 requests / 60 seconds per IP
 """
 
-import asyncio
 import logging
 import time
 from collections import defaultdict
@@ -57,12 +56,11 @@ class RateLimiterMiddleware(BaseHTTPMiddleware):
     async def _check_redis(self, key: str, limit: int, window: int) -> bool:
         """Check rate limit via Redis. Returns True if request is allowed."""
         from app.core.redis_client import rate_limit_check
+
         allowed, _ = await rate_limit_check(f"rl:{key}", limit, window)
         return allowed
 
-    def _check_memory(
-        self, store: dict, key: str, limit: int, window: int
-    ) -> bool:
+    def _check_memory(self, store: dict, key: str, limit: int, window: int) -> bool:
         """Fallback in-memory rate check."""
         store[key] = _clean(store[key], window)
         if len(store[key]) >= limit:
@@ -84,12 +82,16 @@ class RateLimiterMiddleware(BaseHTTPMiddleware):
         try:
             if is_auth:
                 auth_key = f"auth:{client_ip}"
-                allowed = await self._check_redis(auth_key, self.auth_rate, self.auth_window)
+                allowed = await self._check_redis(
+                    auth_key, self.auth_rate, self.auth_window
+                )
                 if not allowed:
                     return _rate_limit_response()
 
             gen_key = f"gen:{client_ip}"
-            allowed = await self._check_redis(gen_key, self.general_rate, self.general_window)
+            allowed = await self._check_redis(
+                gen_key, self.general_rate, self.general_window
+            )
             if not allowed:
                 return _rate_limit_response()
 

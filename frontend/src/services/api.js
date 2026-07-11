@@ -68,6 +68,21 @@ api.interceptors.response.use(
       }
     }
 
+    // Network errors (offline)
+    if (!error.response) {
+      console.error("Network Error: Please check your internet connection.");
+      window.dispatchEvent(new CustomEvent('app-error', { 
+        detail: { message: 'Network error. Please check your connection and try again.' } 
+      }));
+    } 
+    // Server errors (500+)
+    else if (error.response.status >= 500) {
+      console.error("Server Error:", error.response.status);
+      window.dispatchEvent(new CustomEvent('app-error', { 
+        detail: { message: 'The server encountered an unexpected condition. Our team has been notified.' } 
+      }));
+    }
+
     return Promise.reject(error);
   }
 );

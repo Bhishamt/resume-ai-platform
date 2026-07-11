@@ -1,13 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any
+from typing import Any, Dict
+
 
 class BaseAIProvider(ABC):
     @abstractmethod
     async def generate_response(
-        self, 
-        prompt: str, 
-        system_prompt: str = None, 
-        json_mode: bool = False
+        self, prompt: str, system_prompt: str = None, json_mode: bool = False
     ) -> Dict[str, Any]:
         """
         Generate a response from the AI provider.

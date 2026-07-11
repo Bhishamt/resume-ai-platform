@@ -3,13 +3,17 @@ import AppRoutes from "./routes";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { AuthProvider } from "@/context/AuthContext";
 
+import { GlobalToastListener } from "@/components/common/GlobalToastListener";
+
 function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
+        <GlobalToastListener>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </GlobalToastListener>
       </AuthProvider>
     </ThemeProvider>
   );

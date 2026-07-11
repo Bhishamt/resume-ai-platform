@@ -49,7 +49,9 @@ def save_file(file: UploadFile, user_id: UUID) -> tuple[str, str]:
     )
     logger.info(
         "save_file: user=%s stored_as=%s backend=%s",
-        user_id, stored_filename, type(storage).__name__,
+        user_id,
+        stored_filename,
+        type(storage).__name__,
     )
     return stored_filename, storage_path
 

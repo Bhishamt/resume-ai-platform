@@ -1,11 +1,13 @@
-from typing import List, Dict, Any
-from uuid import UUID
 from collections import Counter
+from typing import Any, Dict
+from uuid import UUID
+
 from sqlalchemy.orm import Session
 
-from app.models.resume import Resume
-from app.models.job_match import JobMatch
 from app.models.analysis_report import AnalysisReport
+from app.models.job_match import JobMatch
+from app.models.resume import Resume
+
 
 class AnalyticsService:
     @staticmethod
@@ -17,9 +19,9 @@ class AnalyticsService:
         missing_counter = Counter()
 
         # 1. Collect skills from Job Match history
-        matches = db.query(JobMatch).join(Resume).filter(
-            Resume.user_id == user_id
-        ).all()
+        matches = (
+            db.query(JobMatch).join(Resume).filter(Resume.user_id == user_id).all()
+        )
 
         for m in matches:
             if isinstance(m.matching_skills, list):
@@ -29,9 +31,12 @@ class AnalyticsService:
                 missing_counter.update(s.strip() for s in m.missing_skills if s)
 
         # 2. Collect missing keywords from Analysis Reports
-        reports = db.query(AnalysisReport).join(Resume).filter(
-            Resume.user_id == user_id
-        ).all()
+        reports = (
+            db.query(AnalysisReport)
+            .join(Resume)
+            .filter(Resume.user_id == user_id)
+            .all()
+        )
 
         for r in reports:
             if isinstance(r.missing_keywords, list):
@@ -48,7 +53,4 @@ class AnalyticsService:
         ]
 
         # Return format suited for Radar/Bar chart mapping
-        return {
-            "top_skills": top_skills,
-            "missing_skills": top_missing_skills
-        }
+        return {"top_skills": top_skills, "missing_skills": top_missing_skills}

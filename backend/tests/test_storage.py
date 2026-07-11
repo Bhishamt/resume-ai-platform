@@ -1,11 +1,11 @@
 """Tests for storage abstraction — LocalStorage, S3Storage, and StorageFactory."""
 
-import os
 import uuid
-import pytest
 from io import BytesIO
 from pathlib import Path
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 
 class TestLocalStorage:
@@ -94,8 +94,8 @@ class TestLocalStorage:
 
     def test_invalid_extension_rejected(self, tmp_path):
         """File with unsupported extension raises BadRequestError."""
-        from app.storage.local_storage import LocalStorage
         from app.core.exceptions import BadRequestError
+        from app.storage.local_storage import LocalStorage
 
         storage = LocalStorage(upload_dir=str(tmp_path))
         user_id = uuid.UUID("00000000-0000-0000-0000-000000000003")
@@ -121,8 +121,9 @@ class TestS3Storage:
 
         from botocore.exceptions import BotoCoreError, ClientError
 
-        with patch("boto3.client", return_value=mock_s3), \
-             patch("app.core.config.settings") as mock_settings:
+        with patch("boto3.client", return_value=mock_s3), patch(
+            "app.core.config.settings"
+        ) as mock_settings:
             mock_settings.AWS_ACCESS_KEY_ID = "AKIATEST"
             mock_settings.AWS_SECRET_ACCESS_KEY = "secret"
             mock_settings.AWS_REGION = "us-east-1"
@@ -131,6 +132,7 @@ class TestS3Storage:
             mock_settings.MAX_UPLOAD_SIZE = 10 * 1024 * 1024
 
             from app.storage.s3_storage import S3Storage
+
             storage = S3Storage()
             storage._s3 = mock_s3
             storage._bucket = "test-bucket"
@@ -186,6 +188,7 @@ class TestStorageFactory:
     def test_local_backend_selected_by_default(self):
         """Factory returns LocalStorage when STORAGE_BACKEND=local."""
         from app.storage import storage_factory
+
         storage_factory.reset_storage()
 
         with patch("app.storage.storage_factory.settings") as mock_settings:
@@ -195,6 +198,7 @@ class TestStorageFactory:
 
             storage = storage_factory.get_storage()
             from app.storage.local_storage import LocalStorage
+
             assert isinstance(storage, LocalStorage)
 
         storage_factory.reset_storage()
@@ -202,12 +206,13 @@ class TestStorageFactory:
     def test_s3_backend_selected_when_configured(self):
         """Factory returns S3Storage when STORAGE_BACKEND=s3."""
         from app.storage import storage_factory
+
         storage_factory.reset_storage()
 
         mock_s3_client = MagicMock()
-        with patch("app.storage.storage_factory.settings") as mock_settings, \
-             patch("boto3.client", return_value=mock_s3_client), \
-             patch("app.core.config.settings") as global_settings:
+        with patch("app.storage.storage_factory.settings") as mock_settings, patch(
+            "boto3.client", return_value=mock_s3_client
+        ), patch("app.core.config.settings") as global_settings:
             mock_settings.STORAGE_BACKEND = "s3"
             global_settings.AWS_BUCKET_NAME = "my-bucket"
             global_settings.AWS_ACCESS_KEY_ID = "key"
@@ -216,8 +221,7 @@ class TestStorageFactory:
             global_settings.AWS_S3_ENDPOINT_URL = ""
 
             try:
-                from app.storage.s3_storage import S3Storage
-                storage = storage_factory.get_storage()
+                storage_factory.get_storage()
             except Exception:
                 pass  # S3 init may fail without real credentials
 
@@ -226,6 +230,7 @@ class TestStorageFactory:
     def test_reset_clears_singleton(self):
         """reset_storage() allows a fresh instance to be created."""
         from app.storage import storage_factory
+
         storage_factory.reset_storage()
 
         with patch("app.storage.storage_factory.settings") as mock_settings:

@@ -6,7 +6,6 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-
 # ---------------------------------------------------------------------------
 # Shared
 # ---------------------------------------------------------------------------
@@ -45,6 +44,7 @@ class AdminUserListResponse(BaseModel):
 
 class AdminUserUpdate(BaseModel):
     """Payload for updating a user's role or active status."""
+
     role: Optional[str] = Field(None, pattern="^(user|admin)$")
     is_active: Optional[bool] = None
 

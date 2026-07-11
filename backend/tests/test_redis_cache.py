@@ -1,7 +1,8 @@
 """Tests for Redis cache helpers and JWT blacklist."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 
 
 class TestCacheHelpers:

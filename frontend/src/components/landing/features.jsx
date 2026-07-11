@@ -45,18 +45,21 @@ export function Features() {
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              whileHover={{ y: -5 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
+              className="group h-full"
             >
-              <Card className="h-full bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.04] transition-colors">
-                <CardHeader>
-                  <div className="h-12 w-12 rounded-lg bg-white/10 flex items-center justify-center mb-4">
-                    <feature.icon className="h-6 w-6 text-white" />
+              <Card className="h-full bg-white/[0.02] border-white/[0.05] group-hover:bg-white/[0.04] group-hover:border-white/20 transition-all duration-300 relative overflow-hidden flex flex-col shadow-lg hover:shadow-indigo-500/10">
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/0 via-purple-500/0 to-indigo-500/0 group-hover:from-indigo-500/10 group-hover:to-purple-500/10 transition-all duration-500 pointer-events-none" />
+                <CardHeader className="flex-1">
+                  <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                    <feature.icon className="h-7 w-7 text-white/80 group-hover:text-white transition-colors" />
                   </div>
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
-                  <CardDescription className="text-base mt-2">{feature.description}</CardDescription>
+                  <CardTitle className="text-xl font-bold tracking-tight text-white group-hover:text-indigo-300 transition-colors">{feature.title}</CardTitle>
+                  <CardDescription className="text-base mt-3 text-white/60 leading-relaxed">{feature.description}</CardDescription>
                 </CardHeader>
               </Card>
             </motion.div>

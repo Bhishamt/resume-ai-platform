@@ -40,13 +40,15 @@ export function Testimonials() {
           {testimonials.map((t, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              whileHover={{ y: -5 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
+              className="h-full"
             >
-              <Card className="h-full bg-white/[0.02] border-white/[0.05]">
-                <CardContent className="pt-6">
+              <Card className="h-full bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.04] hover:border-white/10 transition-all duration-300 shadow-lg hover:shadow-indigo-500/10">
+                <CardContent className="pt-8 px-6 pb-6 flex flex-col h-full">
                   <div className="mb-6 flex gap-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <svg key={star} className="h-4 w-4 text-yellow-500 fill-yellow-500" viewBox="0 0 20 20">
@@ -54,10 +56,10 @@ export function Testimonials() {
                       </svg>
                     ))}
                   </div>
-                  <p className="text-white/80 mb-6 line-clamp-4">"{t.quote}"</p>
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarFallback>{t.initials}</AvatarFallback>
+                  <p className="text-white/80 mb-8 leading-relaxed flex-1 italic text-base">"{t.quote}"</p>
+                  <div className="flex items-center gap-4 mt-auto">
+                    <Avatar className="h-10 w-10 border border-white/10 shadow-sm">
+                      <AvatarFallback className="bg-indigo-500/20 text-indigo-300 font-bold">{t.initials}</AvatarFallback>
                     </Avatar>
                     <div>
                       <div className="font-semibold text-white text-sm">{t.name}</div>

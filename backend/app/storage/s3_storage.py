@@ -74,7 +74,9 @@ class S3Storage(BaseStorage):
                 s3_key,
                 ExtraArgs=extra_args,
             )
-            logger.info("S3Storage.save: %s → s3://%s/%s", filename, self._bucket, s3_key)
+            logger.info(
+                "S3Storage.save: %s → s3://%s/%s", filename, self._bucket, s3_key
+            )
             return stored_filename, s3_key
 
         except (self._BotoCoreError, self._ClientError) as exc:
@@ -108,6 +110,7 @@ class S3Storage(BaseStorage):
         try:
             pos = file_obj.tell()
             import os as _os
+
             file_obj.seek(0, _os.SEEK_END)
             size = file_obj.tell()
             file_obj.seek(pos)
