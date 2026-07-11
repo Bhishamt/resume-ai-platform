@@ -19,6 +19,7 @@ def upload_resume(
     db: Session, file: UploadFile, user_id: UUID, title: str | None = None
 ) -> Resume:
     """Save upload to disk, parse raw text, store DB entry, and log history."""
+    storage_service.validate_file(file)
     # 1. Save file securely to disk
     stored_filename, storage_path = storage_service.save_file(file, user_id)
 
@@ -151,6 +152,7 @@ def replace_resume(
     db: Session, resume_id: UUID, file: UploadFile, user_id: UUID
 ) -> Resume:
     """Replace physical file and metadata of an existing resume with a new upload."""
+    storage_service.validate_file(file)
     resume = get_resume_by_id(db, resume_id, user_id)
 
     # 1. Securely save the new file to disk first

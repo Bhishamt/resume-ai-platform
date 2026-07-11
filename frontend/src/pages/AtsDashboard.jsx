@@ -29,10 +29,11 @@ import {
 } from "recharts";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import atsService from "@/services/atsService";
 import resumeService from "@/services/resumeService";
 import { useToast } from "@/hooks/useToast";
-import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast";
 
 export default function AtsDashboard() {
   const { id } = useParams(); // resume_id
@@ -98,17 +99,17 @@ export default function AtsDashboard() {
         <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-white/5 rounded-full animate-pulse" />
+              <Skeleton className="h-10 w-10 rounded-full" />
               <div>
-                <div className="h-6 w-48 bg-white/5 rounded animate-pulse mb-2" />
-                <div className="h-3 w-32 bg-white/5 rounded animate-pulse" />
+                <Skeleton className="h-6 w-48 mb-2" />
+                <Skeleton className="h-3 w-32" />
               </div>
             </div>
-            <div className="h-10 w-32 bg-white/5 rounded-full animate-pulse" />
+            <Skeleton className="h-10 w-32 rounded-full" />
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-1 p-8 h-80 bg-white/[0.02] border border-white/5 rounded-xl animate-pulse" />
-            <div className="lg:col-span-2 p-8 h-80 bg-white/[0.02] border border-white/5 rounded-xl animate-pulse" />
+            <Skeleton className="lg:col-span-1 p-8 h-80 rounded-xl" />
+            <Skeleton className="lg:col-span-2 p-8 h-80 rounded-xl" />
           </div>
         </main>
       </div>
@@ -153,18 +154,18 @@ export default function AtsDashboard() {
   }
 
   return (
-    <ToastProvider>
-      <div className="min-h-screen bg-[#050505] text-white">
-        <div className="h-24" />
+    <div className="min-h-screen bg-[#050505] text-white">
+      <div className="h-24" />
 
-        <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          {/* Header Action Row */}
-          <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <Link
-                to={`/resumes/${id}`}
-                className="p-2 rounded-full hover:bg-white/5 transition-colors text-white/55 hover:text-white"
-              >
+      <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Header Action Row */}
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Link
+              to={`/resumes/${id}`}
+              className="p-2 rounded-full hover:bg-white/5 transition-colors text-white/55 hover:text-white"
+              aria-label="Back to resume"
+            >
                 <ArrowLeft className="h-5 w-5" />
               </Link>
               <div>
@@ -192,15 +193,15 @@ export default function AtsDashboard() {
             </Button>
           </div>
 
-          {!report ? (
-            <Card className="p-8 text-center border-white/5 bg-white/[0.01]">
-              <AlertTriangle className="h-10 w-10 text-yellow-500 mx-auto mb-3 animate-pulse" />
-              <h3 className="text-sm font-semibold text-white">No ATS Audit Available</h3>
-              <p className="text-xs text-white/50 mt-2 max-w-md mx-auto">
-                No scores could be extracted. Click "Re-Run Audit" to calculate scores using our deterministic parser.
-              </p>
-            </Card>
-          ) : (
+        {!report ? (
+          <Card className="p-0 border-white/5 bg-white/[0.01]">
+            <EmptyState 
+              title="No ATS Audit Available" 
+              description='No scores could be extracted. Click "Re-Run Audit" to calculate scores using our deterministic parser.' 
+              icon={AlertTriangle} 
+            />
+          </Card>
+        ) : (
             <div className="space-y-8">
               {/* Score summary and radar chart row */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -494,19 +495,7 @@ export default function AtsDashboard() {
               </Card>
             </div>
           )}
-        </main>
-
-        <ToastViewport />
-        {toasts.map(({ id, title, description, variant }) => (
-          <Toast key={id} className={variant === "error" ? "border-red-500/20 bg-red-500/10 text-red-400" : "border-green-500/20 bg-green-500/10 text-green-400"}>
-            <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
-              {description && <ToastDescription>{description}</ToastDescription>}
-            </div>
-            <ToastClose onClick={() => removeToast(id)} />
-          </Toast>
-        ))}
-      </div>
-    </ToastProvider>
+      </main>
+    </div>
   );
 }

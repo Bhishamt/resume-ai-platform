@@ -120,7 +120,7 @@ export default function ResumeUpload() {
       <main className="flex-grow mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link to="/profile" className="p-2 rounded-full hover:bg-white/5 transition-colors text-white/55 hover:text-white">
+            <Link to="/profile" className="p-2 rounded-full hover:bg-white/5 transition-colors text-white/55 hover:text-white" aria-label="Back to profile">
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <div>

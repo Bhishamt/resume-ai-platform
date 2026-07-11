@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { User as UserIcon, Mail, Calendar, Camera, Shield, LogOut, Check } from "lucide-react";
 import { useToast } from "@/hooks/useToast";
-import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast";
 
 export default function Profile() {
   const { user, updateProfile, logout } = useAuth();
@@ -46,9 +45,8 @@ export default function Profile() {
     : "Unknown date";
 
   return (
-    <ToastProvider>
-      <div className="min-h-screen bg-[#050505] text-white">
-        {/* Header Spacer */}
+    <div className="min-h-screen bg-[#050505] text-white">
+      {/* Header Spacer */}
         <div className="h-24" />
 
         <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
@@ -190,18 +188,6 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Toast Notification Viewport */}
-        <ToastViewport />
-        {toasts.map(({ id, title, description, variant }) => (
-          <Toast key={id} className={variant === "error" ? "border-red-500/20 bg-red-500/10 text-red-400" : "border-green-500/20 bg-green-500/10 text-green-400"}>
-            <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
-              {description && <ToastDescription>{description}</ToastDescription>}
-            </div>
-            <ToastClose onClick={() => removeToast(id)} />
-          </Toast>
-        ))}
       </div>
-    </ToastProvider>
   );
 }

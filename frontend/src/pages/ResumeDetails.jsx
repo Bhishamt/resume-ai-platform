@@ -20,7 +20,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Modal } from "@/components/ui/modal";
 import resumeService from "@/services/resumeService";
 import { useToast } from "@/hooks/useToast";
-import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast";
 
 export default function ResumeDetails() {
   const { id } = useParams();
@@ -148,9 +147,8 @@ export default function ResumeDetails() {
   const phone = resume.parsed_text?.match(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/)?.[0] || null;
 
   return (
-    <ToastProvider>
-      <div className="min-h-screen bg-[#050505] text-white">
-        <div className="h-24" /> {/* Header spacer */}
+    <div className="min-h-screen bg-[#050505] text-white">
+      <div className="h-24" /> {/* Header spacer */}
 
         <input
           ref={fileInputRef}
@@ -164,7 +162,7 @@ export default function ResumeDetails() {
           {/* Header Action Row */}
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
-              <Link to="/resumes" className="p-2 rounded-full hover:bg-white/5 transition-colors text-white/55 hover:text-white">
+              <Link to="/resumes" className="p-2 rounded-full hover:bg-white/5 transition-colors text-white/55 hover:text-white" aria-label="Back to resumes">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
               <div>
@@ -184,6 +182,7 @@ export default function ResumeDetails() {
                         onClick={handleTitleUpdate}
                         disabled={updatingTitle}
                         className="h-8 w-8 text-green-400 hover:bg-green-500/10"
+                        aria-label="Save title"
                       >
                         <Check className="h-4 w-4" />
                       </Button>
@@ -196,6 +195,7 @@ export default function ResumeDetails() {
                         variant="ghost"
                         onClick={() => setIsEditingTitle(true)}
                         className="h-8 w-8 text-white/40 hover:text-white hover:bg-white/5"
+                        aria-label="Edit title"
                       >
                         <Edit2 className="h-3.5 w-3.5" />
                       </Button>
@@ -452,18 +452,6 @@ export default function ResumeDetails() {
           </div>
         </Modal>
 
-        {/* Toast Viewport */}
-        <ToastViewport />
-        {toasts.map(({ id, title, description, variant }) => (
-          <Toast key={id} className={variant === "error" ? "border-red-500/20 bg-red-500/10 text-red-400" : "border-green-500/20 bg-green-500/10 text-green-400"}>
-            <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
-              {description && <ToastDescription>{description}</ToastDescription>}
-            </div>
-            <ToastClose onClick={() => removeToast(id)} />
-          </Toast>
-        ))}
       </div>
-    </ToastProvider>
   );
 }

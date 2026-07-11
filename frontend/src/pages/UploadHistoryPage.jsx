@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Clock, Loader2, FileText } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import resumeService from "@/services/resumeService";
 import { useToast } from "@/hooks/useToast";
-import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast";
-
 export default function UploadHistoryPage() {
   const { toasts, error, removeToast } = useToast();
   
@@ -27,14 +27,13 @@ export default function UploadHistoryPage() {
   }, [error]);
 
   return (
-    <ToastProvider>
-      <div className="min-h-screen bg-[#050505] text-white">
-        <div className="h-24" /> {/* Header spacer */}
+    <div className="min-h-screen bg-[#050505] text-white">
+      <div className="h-24" /> {/* Header spacer */}
 
         <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="mb-8 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Link to="/resumes" className="p-2 rounded-full hover:bg-white/5 transition-colors text-white/55 hover:text-white">
+              <Link to="/resumes" className="p-2 rounded-full hover:bg-white/5 transition-colors text-white/55 hover:text-white" aria-label="Back to resumes">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
               <div>
@@ -50,18 +49,29 @@ export default function UploadHistoryPage() {
           </div>
 
           {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="flex flex-col items-center gap-4">
-                <Loader2 className="h-8 w-8 animate-spin text-white/50" />
-                <p className="text-sm text-white/55">Loading activity log...</p>
+            <Card className="overflow-hidden p-0 border-white/5 bg-white/[0.02]">
+              <div className="p-4 border-b border-white/5 flex gap-4">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-4 w-32" />
               </div>
-            </div>
+              <div className="p-4 border-b border-white/5 flex gap-4">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+              <div className="p-4 flex gap-4">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+            </Card>
           ) : history.length === 0 ? (
-            <div className="text-center py-20 rounded-2xl border border-white/5 bg-white/[0.01]">
-              <Clock className="h-10 w-10 text-white/30 mx-auto mb-3" />
-              <h3 className="text-sm font-semibold text-white">No history records</h3>
-              <p className="text-xs text-white/45 mt-1">Actions will be logged here as you manage resumes.</p>
-            </div>
+            <EmptyState 
+              title="No history records"
+              description="Actions will be logged here as you manage resumes."
+              icon={Clock}
+            />
           ) : (
             <Card className="overflow-hidden">
               <div className="overflow-x-auto">
@@ -115,18 +125,6 @@ export default function UploadHistoryPage() {
           )}
         </main>
 
-        {/* Toast Viewport */}
-        <ToastViewport />
-        {toasts.map(({ id, title, description, variant }) => (
-          <Toast key={id} className={variant === "error" ? "border-red-500/20 bg-red-500/10 text-red-400" : "border-green-500/20 bg-green-500/10 text-green-400"}>
-            <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
-              {description && <ToastDescription>{description}</ToastDescription>}
-            </div>
-            <ToastClose onClick={() => removeToast(id)} />
-          </Toast>
-        ))}
       </div>
-    </ToastProvider>
   );
 }

@@ -19,12 +19,21 @@ export function GlobalToastListener({ children }) {
       {children}
       <ToastViewport />
       {toasts.map((t) => (
-        <Toast key={t.id} className="border-red-500/20 bg-red-500/10 text-red-400">
-          <div className="grid gap-1">
+        <Toast 
+          key={t.id} 
+          className={
+            t.type === "error" 
+              ? "border-red-500/20 bg-red-500/10 text-red-400" 
+              : t.type === "success" 
+                ? "border-green-500/20 bg-green-500/10 text-green-400" 
+                : "border-white/10 bg-[#111111] text-white"
+          }
+        >
+          <div className="grid gap-1" role="status" aria-live="polite">
             {t.title && <ToastTitle>{t.title}</ToastTitle>}
             {t.description && <ToastDescription>{t.description}</ToastDescription>}
           </div>
-          <ToastClose onClick={() => removeToast(t.id)} />
+          <ToastClose aria-label="Close notification" onClick={() => removeToast(t.id)} />
         </Toast>
       ))}
     </ToastProvider>

@@ -26,10 +26,11 @@ import {
 } from "recharts";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import jobMatchingService from "@/services/jobMatchingService";
 import resumeService from "@/services/resumeService";
 import { useToast } from "@/hooks/useToast";
-import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast";
 
 export default function JobMatching() {
   const { toasts, success, error } = useToast();
@@ -167,16 +168,16 @@ export default function JobMatching() {
         <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <div className="h-8 w-64 bg-white/5 rounded-md animate-pulse mb-2" />
-              <div className="h-4 w-96 bg-white/5 rounded-md animate-pulse" />
+              <Skeleton className="h-8 w-64 mb-2" />
+              <Skeleton className="h-4 w-96" />
             </div>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-5 space-y-6">
-              <div className="h-[600px] w-full bg-white/[0.02] border border-white/5 rounded-xl animate-pulse" />
+              <Skeleton className="h-[600px] w-full rounded-xl" />
             </div>
             <div className="lg:col-span-7 space-y-6">
-              <div className="h-[400px] w-full bg-white/[0.02] border border-white/5 rounded-xl animate-pulse" />
+              <Skeleton className="h-[400px] w-full rounded-xl" />
             </div>
           </div>
         </main>
@@ -185,13 +186,13 @@ export default function JobMatching() {
   }
 
   // Pre-calculate Radar Chart Data
-  const radarData = activeReport?.score_explanations
+  const radarData = React.useMemo(() => activeReport?.score_explanations
     ? Object.keys(activeReport.score_explanations).map((key) => ({
         subject: key,
         Score: activeReport.score_explanations[key].percentage,
         fullMark: 100
       }))
-    : [];
+    : [], [activeReport]);
 
   const getPriorityColor = (prio) => {
     if (prio === "High") return "text-red-400 border-red-500/20 bg-red-500/5";
@@ -200,7 +201,6 @@ export default function JobMatching() {
   };
 
   return (
-    <ToastProvider>
       <div className="min-h-screen bg-[#050505] text-white">
         <div className="h-24" />
 
@@ -674,6 +674,7 @@ export default function JobMatching() {
                             size="sm"
                             onClick={() => handleViewReport(match.id)}
                             className="hover:bg-white/10 text-white/60 hover:text-white rounded-full p-2 h-8 w-8"
+                            aria-label="View match report"
                           >
                             <Eye className="h-3.5 w-3.5" />
                           </Button>
@@ -682,6 +683,7 @@ export default function JobMatching() {
                             size="sm"
                             onClick={() => handleDeleteReport(match.id)}
                             className="hover:bg-red-500/10 text-red-400 hover:text-red-400 rounded-full p-2 h-8 w-8"
+                            aria-label="Delete match report"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
@@ -690,8 +692,11 @@ export default function JobMatching() {
                     ))}
                     {history.length === 0 && (
                       <tr>
-                        <td colSpan="6" className="p-8 text-center text-white/35">
-                          No previous match reports found. Match a resume to populate history.
+                        <td colSpan="6" className="p-0 border-b-0">
+                          <EmptyState 
+                            title="No Match History" 
+                            description="Run your first job match above to see it appear here."
+                          />
                         </td>
                       </tr>
                     )}
@@ -703,17 +708,5 @@ export default function JobMatching() {
         </main>
       </div>
 
-      {/* Render Toast Viewports */}
-      <ToastViewport />
-      {toasts.map((t) => (
-        <Toast key={t.id}>
-          <div className="grid gap-1">
-            {t.title && <ToastTitle>{t.title}</ToastTitle>}
-            {t.description && <ToastDescription>{t.description}</ToastDescription>}
-          </div>
-          <ToastClose />
-        </Toast>
-      ))}
-    </ToastProvider>
   );
 }

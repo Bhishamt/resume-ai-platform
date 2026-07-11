@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Modal } from "@/components/ui/modal";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import resumeService from "@/services/resumeService";
 import { useToast } from "@/hooks/useToast";
-import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast";
 
 export default function ResumeList() {
   const { toasts, success, error, removeToast } = useToast();
@@ -71,9 +71,8 @@ export default function ResumeList() {
   const totalPages = Math.ceil(total / limit) || 1;
 
   return (
-    <ToastProvider>
-      <div className="min-h-screen bg-[#050505] text-white">
-        <div className="h-24" /> {/* Header spacer */}
+    <div className="min-h-screen bg-[#050505] text-white">
+      <div className="h-24" /> {/* Header spacer */}
 
         <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -120,20 +119,18 @@ export default function ResumeList() {
             </div>
           ) : resumes.length === 0 ? (
             /* Empty State */
-            <div className="text-center py-20 rounded-2xl border border-white/5 bg-white/[0.01] backdrop-blur-2xl">
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 text-white/40">
-                <FileText className="h-8 w-8" />
-              </div>
-              <h3 className="text-xl font-semibold text-white">No resumes found</h3>
-              <p className="mt-2 text-sm text-white/55 max-w-sm mx-auto">
-                Get started by uploading your first resume. We will parse it and index the skills.
-              </p>
-              <Link to="/resumes/upload" className="mt-6 inline-block">
-                <Button className="rounded-full font-semibold">
-                  Upload Resume
-                </Button>
-              </Link>
-            </div>
+            <EmptyState 
+              title="No resumes found"
+              description="Get started by uploading your first resume. We will parse it and index the skills."
+              icon={FileText}
+              action={
+                <Link to="/resumes/upload">
+                  <Button className="rounded-full font-semibold">
+                    Upload Resume
+                  </Button>
+                </Link>
+              }
+            />
           ) : (
             /* Card Grid List */
             <>
@@ -160,6 +157,7 @@ export default function ResumeList() {
                                 size="icon"
                                 onClick={(e) => openDeleteModal(resume, e)}
                                 className="h-8 w-8 rounded-full text-white/40 hover:text-red-400 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                                aria-label="Delete resume"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -268,18 +266,6 @@ export default function ResumeList() {
           </div>
         </Modal>
 
-        {/* Toast Viewport */}
-        <ToastViewport />
-        {toasts.map(({ id, title, description, variant }) => (
-          <Toast key={id} className={variant === "error" ? "border-red-500/20 bg-red-500/10 text-red-400" : "border-green-500/20 bg-green-500/10 text-green-400"}>
-            <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
-              {description && <ToastDescription>{description}</ToastDescription>}
-            </div>
-            <ToastClose onClick={() => removeToast(id)} />
-          </Toast>
-        ))}
       </div>
-    </ToastProvider>
   );
 }

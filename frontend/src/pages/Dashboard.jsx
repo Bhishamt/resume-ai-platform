@@ -35,10 +35,10 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import dashboardService from "@/services/dashboardService";
 import { useToast } from "@/hooks/useToast";
-import { ToastProvider } from "@/components/ui/toast";
-
 // Progress Ring Component
 function ProgressRing({ percentage, size = 50, strokeWidth = 4, color = "#ffffff" }) {
   const radius = (size - strokeWidth) / 2;
@@ -270,30 +270,28 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <ToastProvider>
-        <div className="min-h-screen bg-[#050505] text-white">
-          <div className="h-24" />
-          <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-            <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div>
-                <div className="h-8 w-64 bg-white/5 rounded-md animate-pulse mb-2" />
-                <div className="h-4 w-96 bg-white/5 rounded-md animate-pulse" />
-              </div>
-              <div className="h-9 w-32 bg-white/5 rounded-xl animate-pulse" />
+      <div className="min-h-screen bg-[#050505] text-white">
+        <div className="h-24" />
+        <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <Skeleton className="h-8 w-64 mb-2" />
+              <Skeleton className="h-4 w-96" />
             </div>
+            <Skeleton className="h-9 w-32 rounded-xl" />
+          </div>
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
               <div className="md:col-span-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[1, 2, 3, 4].map(i => (
-                  <div key={i} className="glass-card p-5 h-[100px] bg-white/[0.02] border border-white/5 animate-pulse rounded-xl" />
+                  <Skeleton key={i} className="h-[100px] rounded-xl w-full" />
                 ))}
               </div>
               {[1, 2, 3, 4].map(i => (
-                <div key={`chart-${i}`} className="md:col-span-6 glass-card p-6 h-[350px] bg-white/[0.02] border border-white/5 animate-pulse rounded-xl" />
+                <Skeleton key={`chart-${i}`} className="md:col-span-6 h-[350px] rounded-xl w-full" />
               ))}
             </div>
           </main>
         </div>
-      </ToastProvider>
     );
   }
 
@@ -309,17 +307,17 @@ export default function Dashboard() {
   const COLORS = ["#ffffff", "#e4e4e7", "#a1a1aa", "#71717a", "#3f3f46"];
 
   // Pie chart dataset mapping
-  const pieData = Object.keys(stats.most_requested_ai_features || {}).map(key => ({
+  const pieData = React.useMemo(() => Object.keys(stats.most_requested_ai_features || {}).map(key => ({
     name: key.replace("_", " ").toUpperCase(),
     value: stats.most_requested_ai_features[key]
-  }));
+  })), [stats.most_requested_ai_features]);
 
   // Skills radar dataset mapping
-  const radarData = (skills.top_skills || []).map(item => ({
+  const radarData = React.useMemo(() => (skills.top_skills || []).map(item => ({
     subject: item.skill,
     A: item.count,
     fullMark: Math.max(...(skills.top_skills || []).map(i => i.count), 1) + 2
-  }));
+  })), [skills.top_skills]);
 
   // Render Widget based on its ID
   const renderWidget = (widgetId, idx) => {
@@ -333,6 +331,7 @@ export default function Dashboard() {
           disabled={isFirst || savingPrefs}
           className="text-white/40 hover:text-white disabled:opacity-20 p-1 transition-all"
           title="Move Up"
+          aria-label="Move Up"
         >
           <ChevronUp className="h-4 w-4" />
         </button>
@@ -341,6 +340,7 @@ export default function Dashboard() {
           disabled={isLast || savingPrefs}
           className="text-white/40 hover:text-white disabled:opacity-20 p-1 transition-all"
           title="Move Down"
+          aria-label="Move Down"
         >
           <ChevronDown className="h-4 w-4" />
         </button>
@@ -432,7 +432,7 @@ export default function Dashboard() {
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex h-full items-center justify-center text-white/40">No score trend details found.</div>
+                  <EmptyState title="No score trend" description="No score trend details found." icon={TrendingUp} />
                 )}
               </div>
             </Card>
@@ -467,7 +467,7 @@ export default function Dashboard() {
                     </AreaChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex h-full items-center justify-center text-white/40">No job matches run.</div>
+                  <EmptyState title="No job matches" description="No job matches run." icon={Briefcase} />
                 )}
               </div>
             </Card>
@@ -527,7 +527,7 @@ export default function Dashboard() {
                     </RadarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex h-full items-center justify-center text-white/40">Match resumes with jobs to display skills.</div>
+                  <EmptyState title="No skills found" description="Match resumes with jobs to display skills." icon={Award} />
                 )}
               </div>
             </Card>
@@ -564,7 +564,7 @@ export default function Dashboard() {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-1 items-center justify-center text-white/40">No missing skills detected yet.</div>
+                <EmptyState title="No missing skills" description="No missing skills detected yet." icon={Award} />
               )}
             </Card>
           </motion.div>
@@ -662,7 +662,7 @@ export default function Dashboard() {
                     </div>
                   </>
                 ) : (
-                  <div className="flex flex-1 h-full items-center justify-center text-white/40">No AI requests logged.</div>
+                  <EmptyState title="No AI requests" description="No AI requests logged." icon={Award} />
                 )}
               </div>
             </Card>
@@ -694,7 +694,7 @@ export default function Dashboard() {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-1 h-full items-center justify-center text-white/40">No activity logged.</div>
+                <EmptyState title="No activity" description="No activity logged." icon={Clock} />
               )}
             </Card>
           </motion.div>
@@ -706,8 +706,7 @@ export default function Dashboard() {
   };
 
   return (
-    <ToastProvider>
-      <div className="min-h-screen bg-[#050505] text-white">
+    <div className="min-h-screen bg-[#050505] text-white">
         <div className="h-24" />
 
         <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -746,6 +745,5 @@ export default function Dashboard() {
 
         </main>
       </div>
-    </ToastProvider>
   );
 }
