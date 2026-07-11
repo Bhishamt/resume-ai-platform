@@ -3,8 +3,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.core.exceptions import (AuthorizationError, BadRequestError,
-                                 NotFoundError)
+from app.core.exceptions import AuthorizationError, BadRequestError, NotFoundError
 from app.models.job_description import JobDescription
 from app.models.job_match import JobMatch
 from app.schemas.job_matching import JobDescriptionCreate

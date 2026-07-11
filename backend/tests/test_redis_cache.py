@@ -150,6 +150,8 @@ class TestRateLimitCheck:
         """Returns allowed=True when count is under limit."""
         mock_client = AsyncMock()
         mock_pipe = AsyncMock()
+        mock_pipe.incr = MagicMock()
+        mock_pipe.expire = MagicMock()
         mock_pipe.execute = AsyncMock(return_value=[5, True])  # count=5
         mock_client.pipeline = MagicMock(return_value=mock_pipe)
 
@@ -165,6 +167,8 @@ class TestRateLimitCheck:
         """Returns allowed=False when count exceeds limit."""
         mock_client = AsyncMock()
         mock_pipe = AsyncMock()
+        mock_pipe.incr = MagicMock()
+        mock_pipe.expire = MagicMock()
         mock_pipe.execute = AsyncMock(return_value=[11, True])  # count=11 > limit=10
         mock_client.pipeline = MagicMock(return_value=mock_pipe)
 

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Clock, Loader2, FileText } from "lucide-react";
+import { ArrowLeft, Clock, FileText } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import resumeService from "@/services/resumeService";
 import { useToast } from "@/hooks/useToast";
 export default function UploadHistoryPage() {
-  const { toasts, error, removeToast } = useToast();
+  const { error } = useToast();
   
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);

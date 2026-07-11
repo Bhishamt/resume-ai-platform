@@ -7,8 +7,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from app.repositories import admin_repository
-from app.schemas.admin import (AdminLogListResponse, AdminLogResponse,
-                               PaginatedMeta)
+from app.schemas.admin import AdminLogListResponse, AdminLogResponse, PaginatedMeta
 
 logger = logging.getLogger(__name__)
 

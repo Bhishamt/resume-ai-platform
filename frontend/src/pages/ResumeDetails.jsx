@@ -25,7 +25,7 @@ export default function ResumeDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
-  const { toasts, success, error, removeToast } = useToast();
+  const { success, error } = useToast();
 
   const [resume, setResume] = useState(null);
   const [loading, setLoading] = useState(true);

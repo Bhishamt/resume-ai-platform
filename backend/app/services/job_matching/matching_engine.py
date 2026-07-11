@@ -3,8 +3,7 @@ from typing import Dict, List
 from app.services.job_matching.education_matcher import EducationMatcher
 from app.services.job_matching.experience_matcher import ExperienceMatcher
 from app.services.job_matching.keyword_matcher import KeywordMatcher
-from app.services.job_matching.recommendation_engine import \
-    RecommendationEngine
+from app.services.job_matching.recommendation_engine import RecommendationEngine
 from app.services.job_matching.score_calculator import ScoreCalculator
 from app.services.job_matching.similarity_engine import SimilarityEngine
 from app.services.job_matching.skill_matcher import SkillMatcher

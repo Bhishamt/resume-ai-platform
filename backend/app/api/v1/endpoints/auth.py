@@ -12,9 +12,14 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_db
-from app.schemas.user import (APIResponse, ForgotPasswordRequest,
-                              RefreshTokenRequest, ResetPasswordRequest,
-                              UserLogin, UserRegister)
+from app.schemas.user import (
+    APIResponse,
+    ForgotPasswordRequest,
+    RefreshTokenRequest,
+    ResetPasswordRequest,
+    UserLogin,
+    UserRegister,
+)
 from app.services import auth_service
 
 router = APIRouter()

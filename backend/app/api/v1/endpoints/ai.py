@@ -5,10 +5,15 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_current_active_user, get_db
 from app.models.user import User
-from app.schemas.ai import (AICareerRequest, AICoverLetterRequest,
-                            AIFeedbackResponse, AIImproveProjectsRequest,
-                            AIImproveSummaryRequest, AIInterviewRequest,
-                            AIReviewRequest)
+from app.schemas.ai import (
+    AICareerRequest,
+    AICoverLetterRequest,
+    AIFeedbackResponse,
+    AIImproveProjectsRequest,
+    AIImproveSummaryRequest,
+    AIInterviewRequest,
+    AIReviewRequest,
+)
 from app.schemas.user import APIResponse
 from app.services.ai.ai_service import ai_service
 

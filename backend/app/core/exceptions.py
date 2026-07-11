@@ -128,7 +128,7 @@ def register_exception_handlers(app: FastAPI) -> None:
             error_messages.append(f"{field}: {msg}")
         logger.warning("Validation error: %s", error_messages)
         return _error_response(
-            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
             "Validation failed.",
             error_messages,
         )

@@ -38,7 +38,7 @@ import { useToast } from "@/hooks/useToast";
 export default function AtsDashboard() {
   const { id } = useParams(); // resume_id
   const navigate = useNavigate();
-  const { toasts, success, error, removeToast } = useToast();
+  const { success, error } = useToast();
 
   const [resume, setResume] = useState(null);
   const [report, setReport] = useState(null);

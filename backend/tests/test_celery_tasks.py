@@ -133,7 +133,7 @@ class TestNotificationTask:
             return True
 
         mock_service.send_welcome = MagicMock(
-            return_value=asyncio.coroutine(lambda: True)()
+            return_value=async_true()
         )
 
         with patch(
@@ -157,7 +157,7 @@ class TestCleanupTask:
         """Handles missing upload directory gracefully."""
         from app.tasks.cleanup_tasks import cleanup_orphaned_files
 
-        with patch("app.core.config.settings") as mock_settings, patch(
+        with patch("app.tasks.cleanup_tasks.settings") as mock_settings, patch(
             "app.database.base.SessionLocal"
         ) as mock_session:
             mock_settings.UPLOAD_DIR = str(tmp_path / "nonexistent")

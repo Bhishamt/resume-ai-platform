@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Filter, RefreshCw, Search } from "lucide-react";
+import { Filter, RefreshCw } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import LogTable from "@/components/admin/LogTable";
 import adminService from "@/services/adminService";

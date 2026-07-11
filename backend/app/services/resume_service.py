@@ -5,8 +5,7 @@ from fastapi import UploadFile
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
-from app.core.exceptions import (AuthorizationError, BadRequestError,
-                                 NotFoundError)
+from app.core.exceptions import AuthorizationError, BadRequestError, NotFoundError
 from app.models.resume import Resume
 from app.models.upload_history import UploadHistory
 from app.services import storage_service

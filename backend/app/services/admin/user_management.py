@@ -9,8 +9,7 @@ from sqlalchemy.orm import Session
 from app.core.exceptions import BadRequestError, NotFoundError
 from app.models.user import User
 from app.repositories import admin_repository
-from app.schemas.admin import (AdminUserListResponse, AdminUserResponse,
-                               PaginatedMeta)
+from app.schemas.admin import AdminUserListResponse, AdminUserResponse, PaginatedMeta
 from app.services.admin import log_service
 
 logger = logging.getLogger(__name__)

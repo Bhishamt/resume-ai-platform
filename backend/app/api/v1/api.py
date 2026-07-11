@@ -1,7 +1,17 @@
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import (admin, ai, analysis, auth, dashboard, health,
-                                  job_matching, resumes, users, ws)
+from app.api.v1.endpoints import (
+    admin,
+    ai,
+    analysis,
+    auth,
+    dashboard,
+    health,
+    job_matching,
+    resumes,
+    users,
+    ws,
+)
 
 api_router = APIRouter()
 

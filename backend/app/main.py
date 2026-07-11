@@ -13,6 +13,7 @@ import logging  # noqa: E402 (must come after configure_logging)
 
 from fastapi import FastAPI, Request, Response  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
+from contextlib import asynccontextmanager  # noqa: E402
 
 from app.api.v1.api import api_router  # noqa: E402
 from app.core.config import settings  # noqa: E402
@@ -21,6 +22,51 @@ from app.middleware.rate_limiter import RateLimiterMiddleware  # noqa: E402
 from app.middleware.request_id import RequestIDMiddleware  # noqa: E402
 
 logger = logging.getLogger(__name__)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info(
+        "Starting %s [env=%s storage=%s email=%s]",
+        settings.PROJECT_NAME,
+        settings.APP_ENV,
+        settings.STORAGE_BACKEND,
+        settings.EMAIL_PROVIDER,
+    )
+
+    if settings.APP_ENV == "production":
+        dangerous_defaults = [
+            "placeholder_secret_key_change_in_production",
+            "placeholder_jwt_secret_change_in_production",
+        ]
+        if (
+            settings.SECRET_KEY in dangerous_defaults
+            or settings.JWT_SECRET in dangerous_defaults
+        ):
+            raise RuntimeError(
+                "FATAL: Placeholder secrets detected in production. "
+                "Set SECRET_KEY and JWT_SECRET in environment."
+            )
+
+    try:
+        from app.core.redis_client import ping_redis
+        redis_ok = await ping_redis()
+        if redis_ok:
+            logger.info("Redis connected successfully")
+        else:
+            logger.warning("Redis not reachable — caching and rate limiting degraded")
+    except Exception as exc:
+        logger.warning("Redis connection check failed: %s", exc)
+        
+    yield
+    
+    logger.info("Shutting down %s", settings.PROJECT_NAME)
+    try:
+        from app.core.redis_client import _redis_client
+        if _redis_client:
+            await _redis_client.aclose()
+            logger.info("Redis connection closed")
+    except Exception as exc:
+        logger.warning("Redis shutdown error: %s", exc)
 
 # ── FastAPI Application ───────────────────────────────────────────────────────
 
@@ -31,6 +77,7 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     docs_url=f"{settings.API_V1_STR}/docs",
     redoc_url=f"{settings.API_V1_STR}/redoc",
+    lifespan=lifespan,
 )
 
 # ── Exception Handlers ────────────────────────────────────────────────────────
@@ -138,60 +185,6 @@ async def enforce_request_size(request: Request, call_next) -> Response:
     return await call_next(request)
 
 
-# ── Startup / Shutdown Events ─────────────────────────────────────────────────
-
-
-@app.on_event("startup")
-async def on_startup() -> None:
-    """Run startup tasks: validate configuration and warm connections."""
-    logger.info(
-        "Starting %s [env=%s storage=%s email=%s]",
-        settings.PROJECT_NAME,
-        settings.APP_ENV,
-        settings.STORAGE_BACKEND,
-        settings.EMAIL_PROVIDER,
-    )
-
-    # Validate secrets are not placeholders in production
-    if settings.APP_ENV == "production":
-        dangerous_defaults = [
-            "placeholder_secret_key_change_in_production",
-            "placeholder_jwt_secret_change_in_production",
-        ]
-        if (
-            settings.SECRET_KEY in dangerous_defaults
-            or settings.JWT_SECRET in dangerous_defaults
-        ):
-            raise RuntimeError(
-                "FATAL: Placeholder secrets detected in production. "
-                "Set SECRET_KEY and JWT_SECRET in environment."
-            )
-
-    # Warm Redis connection
-    try:
-        from app.core.redis_client import ping_redis
-
-        redis_ok = await ping_redis()
-        if redis_ok:
-            logger.info("Redis connected successfully")
-        else:
-            logger.warning("Redis not reachable — caching and rate limiting degraded")
-    except Exception as exc:
-        logger.warning("Redis connection check failed: %s", exc)
-
-
-@app.on_event("shutdown")
-async def on_shutdown() -> None:
-    """Graceful shutdown — close Redis connection pool."""
-    logger.info("Shutting down %s", settings.PROJECT_NAME)
-    try:
-        from app.core.redis_client import _redis_client
-
-        if _redis_client:
-            await _redis_client.aclose()
-            logger.info("Redis connection closed")
-    except Exception as exc:
-        logger.warning("Redis shutdown error: %s", exc)
 
 
 # ── Router ────────────────────────────────────────────────────────────────────

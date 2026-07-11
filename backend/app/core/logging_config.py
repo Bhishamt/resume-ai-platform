@@ -17,7 +17,7 @@ def configure_logging() -> None:
 
     if settings.LOG_FORMAT == "json":
         try:
-            from pythonjsonlogger import jsonlogger
+            from pythonjsonlogger import json as jsonlogger
 
             class CustomJsonFormatter(jsonlogger.JsonFormatter):
                 def add_fields(

@@ -10,6 +10,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  packages: write
+  security-events: write
+
 env:
   PYTHON_VERSION: "3.12"
   NODE_VERSION: "20"
@@ -32,13 +37,19 @@ jobs:
           cache-dependency-path: backend/requirements.txt
 
       - name: Install linting tools
-        run: pip install ruff
+        run: pip install ruff black isort
 
       - name: Run Ruff linter
-        run: ruff check backend/app --output-format=github
+        working-directory: backend
+        run: ruff check .
 
-      - name: Run Ruff formatter check
-        run: ruff format --check backend/app
+      - name: Run Black formatter check
+        working-directory: backend
+        run: black --check .
+
+      - name: Run isort check
+        working-directory: backend
+        run: isort . --check-only
 
   # ── 2. Backend Tests ─────────────────────────────────────────────────────────
   backend-test:

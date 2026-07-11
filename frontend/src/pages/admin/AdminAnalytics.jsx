@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, AreaChart, Area,
 } from "recharts";
 import { RefreshCw, TrendingUp } from "lucide-react";

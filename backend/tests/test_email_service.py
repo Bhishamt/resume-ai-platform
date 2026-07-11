@@ -83,8 +83,7 @@ class TestSendGridProvider:
             with patch(
                 "sendgrid.SendGridAPIClient", return_value=mock_sg_client
             ), patch("app.services.email.sendgrid_provider.settings", mock_settings):
-                from app.services.email.sendgrid_provider import \
-                    SendGridProvider
+                from app.services.email.sendgrid_provider import SendGridProvider
 
                 provider = SendGridProvider()
                 provider._sg = mock_sg_client
@@ -155,7 +154,9 @@ class TestEmailService:
 
             with patch("app.services.email.smtp_provider.SMTPProvider"):
                 from app.services.email.email_service import (
-                    EmailService, get_email_service)
+                    EmailService,
+                    get_email_service,
+                )
 
                 service = get_email_service()
                 assert isinstance(service, EmailService)

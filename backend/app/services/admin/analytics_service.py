@@ -6,8 +6,13 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 
 from app.repositories import admin_repository
-from app.schemas.admin import (AnalyticsResponse, ATSBucket, ChartDataPoint,
-                               DashboardStats, ProviderStat)
+from app.schemas.admin import (
+    AnalyticsResponse,
+    ATSBucket,
+    ChartDataPoint,
+    DashboardStats,
+    ProviderStat,
+)
 
 logger = logging.getLogger(__name__)
 

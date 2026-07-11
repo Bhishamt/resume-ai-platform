@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/useToast";
 
 export default function Profile() {
   const { user, updateProfile, logout } = useAuth();
-  const { toasts, success, error, removeToast } = useToast();
+  const { success, error } = useToast();
   const [isUpdating, setIsUpdating] = useState(false);
 
   const {

@@ -332,8 +332,7 @@ class TestNotifications:
         with patch(
             "app.api.v1.endpoints.admin.notification_service.list_notifications"
         ) as mock_list:
-            from app.schemas.admin import (NotificationListResponse,
-                                           PaginatedMeta)
+            from app.schemas.admin import NotificationListResponse, PaginatedMeta
 
             mock_list.return_value = NotificationListResponse(
                 notifications=[],

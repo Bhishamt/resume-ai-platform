@@ -8,8 +8,12 @@ from sqlalchemy.orm import Session
 
 from app.core.exceptions import NotFoundError
 from app.repositories import admin_repository
-from app.schemas.admin import (NotificationCreate, NotificationListResponse,
-                               NotificationResponse, PaginatedMeta)
+from app.schemas.admin import (
+    NotificationCreate,
+    NotificationListResponse,
+    NotificationResponse,
+    PaginatedMeta,
+)
 
 logger = logging.getLogger(__name__)
 

@@ -11,7 +11,7 @@ import resumeService from "@/services/resumeService";
 import { useToast } from "@/hooks/useToast";
 
 export default function ResumeList() {
-  const { toasts, success, error, removeToast } = useToast();
+  const { success, error } = useToast();
   
   const [resumes, setResumes] = useState([]);
   const [total, setTotal] = useState(0);

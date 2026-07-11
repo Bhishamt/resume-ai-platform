@@ -34,14 +34,24 @@ from app.api.dependencies import get_admin_user, get_db
 from app.core.exceptions import NotFoundError
 from app.models.user import User
 from app.repositories import admin_repository
-from app.schemas.admin import (AdminResumeListResponse, AdminResumeResponse,
-                               AdminUserUpdate, AIMonitoringResponse,
-                               BulkSettingsUpdate, NotificationCreate,
-                               PaginatedMeta, SystemHealthResponse)
+from app.schemas.admin import (
+    AdminResumeListResponse,
+    AdminResumeResponse,
+    AdminUserUpdate,
+    AIMonitoringResponse,
+    BulkSettingsUpdate,
+    NotificationCreate,
+    PaginatedMeta,
+    SystemHealthResponse,
+)
 from app.schemas.user import APIResponse
-from app.services.admin import (analytics_service, log_service,
-                                notification_service, settings_service,
-                                user_management)
+from app.services.admin import (
+    analytics_service,
+    log_service,
+    notification_service,
+    settings_service,
+    user_management,
+)
 from app.services.admin.admin_service import get_client_ip
 
 logger = logging.getLogger(__name__)

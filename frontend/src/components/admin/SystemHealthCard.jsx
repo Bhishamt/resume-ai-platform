@@ -30,7 +30,7 @@ function StatusBadge({ status }) {
   );
 }
 
-function UsageBar({ percent, color = "indigo" }) {
+function UsageBar({ percent }) {
   const colors = {
     indigo: "bg-indigo-500",
     emerald: "bg-emerald-500",

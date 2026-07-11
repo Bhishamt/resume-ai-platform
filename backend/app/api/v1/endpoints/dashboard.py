@@ -3,8 +3,10 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_current_active_user, get_db
 from app.models.user import User
-from app.schemas.dashboard import (DashboardPreferencesResponse,
-                                   DashboardPreferencesUpdate)
+from app.schemas.dashboard import (
+    DashboardPreferencesResponse,
+    DashboardPreferencesUpdate,
+)
 from app.schemas.user import APIResponse
 from app.services.dashboard.analytics_service import AnalyticsService
 from app.services.dashboard.dashboard_service import DashboardService

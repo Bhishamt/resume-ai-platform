@@ -10,8 +10,12 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_current_active_user, get_db
 from app.models.user import User
-from app.schemas.resume import (PaginatedResumes, ResumeResponse, ResumeUpdate,
-                                UploadHistoryResponse)
+from app.schemas.resume import (
+    PaginatedResumes,
+    ResumeResponse,
+    ResumeUpdate,
+    UploadHistoryResponse,
+)
 from app.schemas.user import APIResponse
 from app.services import resume_service
 

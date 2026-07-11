@@ -4,7 +4,6 @@ import {
   CheckCircle,
   AlertTriangle,
   Lightbulb,
-  FileText,
   Loader2,
   Trash2,
   Eye,
@@ -33,7 +32,7 @@ import resumeService from "@/services/resumeService";
 import { useToast } from "@/hooks/useToast";
 
 export default function JobMatching() {
-  const { toasts, success, error } = useToast();
+  const { success, error } = useToast();
 
   const [resumes, setResumes] = useState([]);
   const [history, setHistory] = useState([]);
@@ -69,6 +68,7 @@ export default function JobMatching() {
       const historyData = await jobMatchingService.getMatches();
       setHistory(historyData.data || []);
     } catch (err) {
+      console.error(err);
       error("Failed to load initial data. Please reload the page.");
     } finally {
       setLoading(false);
@@ -141,6 +141,7 @@ export default function JobMatching() {
       success("Loaded job match report.");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
+      console.error(err);
       error("Failed to load match report details.");
     } finally {
       setLoading(false);
@@ -157,6 +158,7 @@ export default function JobMatching() {
         setActiveReport(null);
       }
     } catch (err) {
+      console.error(err);
       error("Failed to delete match report.");
     }
   };
