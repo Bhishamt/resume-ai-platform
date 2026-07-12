@@ -127,7 +127,6 @@ class TestNotificationTask:
         mock_service = MagicMock()
         mock_service.send_welcome = MagicMock(return_value=None)
 
-        import asyncio
 
         async def async_true():
             return True
